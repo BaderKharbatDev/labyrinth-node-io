@@ -10,3 +10,4 @@ require('./server/server_routing')(app, express)
 require('./server/server_sockets')(io)
 
 server.listen(port);
+console.log('Started on '+port)

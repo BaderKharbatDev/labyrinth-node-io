@@ -1,6 +1,4 @@
-import {Tile} from './entity'
-
-class cell {
+class Cell {
     constructor(row, col, collidable) {
         this.row = row
         this.col = col
@@ -10,49 +8,83 @@ class cell {
     }
 }
 
-export default class maze {
-    constructor(size) {
-        this.size = size
-        this.grid = [size][size]
-    }
-
-    getObstacleArray() {
-        let rv = [this.size][this.size]
-        for(let row = 0; row < this.size; row++) {
-            for(let col = 0; col < this.size; col++) {
-                obstacle = this.grid[row][col]
-                if(obstacle != null && obstacle instanceof Tile && obstacle.collidable == true) {
-                    rv[row][col] = True
-                } else {
-                    rv[row][col] = False
-                }
-            }
+module.exports = class Maze {
+    constructor(half_size) {
+        this.half_size = half_size
+        this.full_size = 2*half_size+1
+        this.grid = new Array(this.full_size)
+        for (var i = 0; i < this.full_size; i++) {
+            this.grid[i] = new Array(this.full_size);
         }
     }
 
-    initBlankMaze() {
-        for(let row = 0; row < this.size; row++) {
-            for(let col = 0; col < this.size; col++) {
-                if(row%2 == 0 || col%2 == 0) {
-                    self.grid[row][col] = new cell(row, col, true)
+    getObstacleArray() {
+        var rv = new Array(this.grid.length)
+        for (var i = 0; i < rv.length; i++) {
+            rv[i] = new Array(rv.length);
+        }
+
+        for(let row = 0; row < this.grid.length; row++) {
+            for(let col = 0; col < this.grid.length; col++) {
+                var cell = this.grid[row][col]
+                if(cell.collidable == true) {
+                    rv[row][col] = true
                 } else {
-                    self.grid[row][col] = new cell(row, col, false)
+                    rv[row][col] = false
+                }
+            }
+        }
+        return rv
+    }
+
+    initBlankMaze() {
+        for(let row = 0; row < this.grid.length; row++) {
+            for(let col = 0; col < this.grid.length; col++) {
+                if(row%2 == 0 || col%2 == 0) {
+                    this.grid[row][col] = new Cell(row, col, true)
+                } else {
+                    this.grid[row][col] = new Cell(row, col, false)
                 }
             }
         }
         this.grid[1][1].isStart = true
     }
 
-    generateMaze(startRow, startCol) {
-        endArray = []
-        stack = []
-        currentCell = this.grid[startRow][startCol]
-        
+    generateMaze() {
+        var startRow = 1, startCol = 1
+        var endArray = []
+        var stack = []
+        var currentCell = this.grid[startRow][startCol]
+        currentCell.checked = true
+
+
+        let uncheckedCellCount = ((this.full_size-1)/2) ** 2
+        while(uncheckedCellCount != 0) {
+            if(this.getNumberOfNeighbors(currentCell) != 0) {
+                let temp_cell = this.getRandomNeightborCell(currentCell)
+                if(this.getNumberOfNeighbors(currentCell) > 1) {
+                    stack.push(currentCell)
+                }
+                let wall = this.getWallBetweenCells(currentCell, temp_cell)
+                wall.collidable = false
+
+                currentCell = temp_cell
+                currentCell.checked = true
+                uncheckedCellCount--
+            } else if(stack.length != 0) {
+                endArray.push(currentCell)
+                currentCell = self.getNextCellInStack(stack)
+                if(currentCell == null) break
+            }
+        }
+        if(endArray.length != 0) {
+            endArray[Math.floor(endArray.length/2)]
+        }
     }
 
     getNextCellInStack(stack) {
-        cell = stack.pop()
-        if(this.getNumberOfNeighbors(cell.row, cell.col) != 0){
+        var cell = stack.pop()
+        if(this.getNumberOfNeighbors(cell) != 0){
             return cell
         } else {
             if(stack.length == 0) return null
@@ -60,7 +92,8 @@ export default class maze {
         }
     }
 
-    getWallBetweenCells(aRow,aCol,bRow,bCol) {
+    getWallBetweenCells(a,b) {
+        var aRow = a.row, aCol = a.col, bRow = b.row, bCol = b.col
         if(aRow == bRow) {
             if(aCol<bCol) {
                 return this.grid[aRow][aCol+1]
@@ -76,11 +109,12 @@ export default class maze {
         }
     }
 
-    getRandomNeightborCell(cellRow, cellCol) {
-        neighborArray = []
-        for(const horizontal in [-2,2]) {
+    getRandomNeightborCell(c) {
+        var cellRow = c.row, cellCol = c.col
+        var neighborArray = []
+        for(const horizontal of [-2,2]) {
             try {
-                cell = this.grid[cellRow][cellCol+horizontal] //left right neighbors
+                var cell = this.grid[cellRow][cellCol+horizontal] //left right neighbors
                 if(!cell.isChecked && !cell.collidable) {
                     neighborArray.push(cell)
                 }
@@ -88,9 +122,9 @@ export default class maze {
                 //out of bounds
             }
         }
-        for(const verticle in [-2,2]) {
+        for(const verticle of [-2,2]) {
             try {
-                cell = this.grid[cellRow+verticle][cellCol] //left right neighbors
+                var cell = this.grid[cellRow+verticle][cellCol] //left right neighbors
                 if(!cell.isChecked && !cell.collidable) {
                     neighborArray.push(cell)
                 }
@@ -102,11 +136,12 @@ export default class maze {
         return neighborArray[rInd]
     }
 
-    getNumberOfNeighbors(cellRow, cellCol) {
-        let count = 0
-        for(const horizontal in [-2,2]) {
+    getNumberOfNeighbors(c) {
+        var cellRow = c.row, cellCol = c.col
+        var count = 0
+        for(const horizontal of [-2,2]) {
             try {
-                cell = this.grid[cellRow][cellCol+horizontal] //left right neighbors
+                var cell = this.grid[cellRow][cellCol+horizontal] //left right neighbors
                 if(!cell.isChecked && !cell.collidable) {
                     count++
                 }
@@ -114,9 +149,9 @@ export default class maze {
                 //out of bounds
             }
         }
-        for(const verticle in [-2,2]) {
+        for(const verticle of [-2,2]) {
             try {
-                cell = this.grid[cellRow+verticle][cellCol] //left right neighbors
+                var cell = this.grid[cellRow+verticle][cellCol] //up down neighbors
                 if(!cell.isChecked && !cell.collidable) {
                     count++
                 }

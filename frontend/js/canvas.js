@@ -8,8 +8,9 @@ export default class canvas {
     
         this.board = new Board(canvas_id, canvas_pixle_size, board_length)
         this.board.colorBG(colors.white)
-        this.board.colorGrid(colors.red)
     }
+
+    
 }
 
     
