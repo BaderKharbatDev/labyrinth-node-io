@@ -20,6 +20,17 @@ export default class board {
             }
         }
     }
+
+    paintObstacles(color, grid) {
+        this.ctx.fillStyle = color
+        for(let row = 0; row < length(grid); row++) {
+            for(let col = 0; col < length(grid); col++) {
+                if(grid[row][col] == True) {
+                    this.ctx.fillRect(col*this.block_size, row*this.block_size, this.block_size-1, this.block_size-1)
+                }
+            }
+        }
+    }
     
     
 }

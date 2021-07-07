@@ -5,5 +5,5 @@ let client_canvas = {}
 
 socket.on('connect', function(data) {
     console.log('Connected')
-    client_canvas = new Canvas() 
+    client_canvas = new Canvas(20) 
 });
