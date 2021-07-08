@@ -16,13 +16,11 @@ module.exports = function(io) {
 
 function addUser(socket) {
     if(connections.length == 0) {
-        let size = 12
-        let grid = makeMaze(12)
+        let grid = makeMaze(5)
         map = {size: grid.length, obstacles: grid}
     }
     console.log('A user connected: '+socket.id);
     connections[socket.id] = socket
-    
 }
 
 function removeUser(socket) {
