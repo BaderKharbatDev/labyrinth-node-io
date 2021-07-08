@@ -26,7 +26,7 @@ export default class board {
         for(let row = 0; row < grid.length; row++) {
             for(let col = 0; col < grid[row].length; col++) {
                 if(grid[row][col] == true) {
-                    this.ctx.fillRect(col*this.block_size, row*this.block_size, this.block_size-1, this.block_size-1)
+                    this.ctx.fillRect(col*this.block_size-1, row*this.block_size-1, this.block_size+1, this.block_size+1)
                 }
             }
         }

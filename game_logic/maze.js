@@ -4,7 +4,6 @@ class Cell {
         this.col = col
         this.collidable = collidable
         this.checked = false
-        this.isStart = false
     }
 }
 
@@ -47,22 +46,23 @@ module.exports = class Maze {
                 }
             }
         }
-        this.grid[1][1].isStart = true
     }
 
     generateMaze() {
         var startRow = 1, startCol = 1
+        this.grid[startRow][startCol].isStart = true
+
         var endArray = []
         var stack = []
         var currentCell = this.grid[startRow][startCol]
         currentCell.checked = true
 
-
-        let uncheckedCellCount = ((this.full_size-1)/2) ** 2
+        let uncheckedCellCount = Math.floor((this.full_size-1)/2)**2
         while(uncheckedCellCount != 0) {
-            if(this.getNumberOfNeighbors(currentCell) != 0) {
+            var neighborCount = this.getNumberOfNeighbors(currentCell)
+            if(neighborCount != 0) {
                 let temp_cell = this.getRandomNeightborCell(currentCell)
-                if(this.getNumberOfNeighbors(currentCell) > 1) {
+                if(neighborCount > 1) {
                     stack.push(currentCell)
                 }
                 let wall = this.getWallBetweenCells(currentCell, temp_cell)
@@ -73,12 +73,13 @@ module.exports = class Maze {
                 uncheckedCellCount--
             } else if(stack.length != 0) {
                 endArray.push(currentCell)
-                currentCell = self.getNextCellInStack(stack)
-                if(currentCell == null) break
+                currentCell = this.getNextCellInStack(stack)
+                if(currentCell == null) 
+                    break
             }
         }
         if(endArray.length != 0) {
-            endArray[Math.floor(endArray.length/2)]
+            endArray[Math.floor(endArray.length/2)].isEnd = true
         }
     }
 
@@ -115,7 +116,7 @@ module.exports = class Maze {
         for(const horizontal of [-2,2]) {
             try {
                 var cell = this.grid[cellRow][cellCol+horizontal] //left right neighbors
-                if(!cell.isChecked && !cell.collidable) {
+                if(!cell.checked && !cell.collidable) {
                     neighborArray.push(cell)
                 }
             } catch(error) {
@@ -125,7 +126,7 @@ module.exports = class Maze {
         for(const verticle of [-2,2]) {
             try {
                 var cell = this.grid[cellRow+verticle][cellCol] //left right neighbors
-                if(!cell.isChecked && !cell.collidable) {
+                if(!cell.checked && !cell.collidable) {
                     neighborArray.push(cell)
                 }
             } catch(error) {
@@ -142,7 +143,7 @@ module.exports = class Maze {
         for(const horizontal of [-2,2]) {
             try {
                 var cell = this.grid[cellRow][cellCol+horizontal] //left right neighbors
-                if(!cell.isChecked && !cell.collidable) {
+                if(!cell.checked && !cell.collidable) {
                     count++
                 }
             } catch(error) {
@@ -152,7 +153,7 @@ module.exports = class Maze {
         for(const verticle of [-2,2]) {
             try {
                 var cell = this.grid[cellRow+verticle][cellCol] //up down neighbors
-                if(!cell.isChecked && !cell.collidable) {
+                if(!cell.checked && !cell.collidable) {
                     count++
                 }
             } catch(error) {
