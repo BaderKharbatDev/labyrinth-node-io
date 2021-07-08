@@ -1,5 +1,5 @@
 import {colors, units} from '/static/js/constants.js'
-import Board from '/game_logic/board.js'
+import Board from '/static/js/board.js'
 
 export default class canvas {
     constructor(board_length) {
