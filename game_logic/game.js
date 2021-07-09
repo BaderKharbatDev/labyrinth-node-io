@@ -7,13 +7,22 @@ export default class Game {
         FINISHED: 2
     }
 
-    constructor() {
-        this.id
+    constructor(id) {
+        this.id = id
         this.players = {}
-        this.gameState = gameStates.WAITING
+        this.gameState = gameStates.LOBBY
 
         this.grid_size
         this.walls   
+    }
+
+    removePlayer(socketID) {
+        delete this.players[socketID]
+    }
+
+    addPlayer(socketID) {
+        let player = new Players(socketID, "name", null, 1, 1, 0.5)
+        this.players[socketID] = player
     }
 
     sleep(ms) {

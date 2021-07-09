@@ -1,7 +1,7 @@
 const Maze = require('../game_logic/maze.js')
 var map = {}
 const connections = []
-const games = []
+const game = {}
 
 module.exports = function(io) {
 
@@ -37,8 +37,10 @@ function addUser(socket) {
         let grid = makeMaze(10)
         map = {size: grid.length, obstacles: grid}
     }
+
     console.log('A user connected: '+socket.id);
     connections[socket.id] = socket
+
 }
 
 function removeUser(socket) {
