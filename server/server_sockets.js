@@ -16,7 +16,7 @@ module.exports = function(io) {
 
 function addUser(socket) {
     if(connections.length == 0) {
-        let grid = makeMaze(5)
+        let grid = makeMaze(10)
         map = {size: grid.length, obstacles: grid}
     }
     console.log('A user connected: '+socket.id);

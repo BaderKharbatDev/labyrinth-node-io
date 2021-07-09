@@ -1,3 +1,5 @@
+const Players = require('entity.js').Player
+
 export default class Game {
     static gameStates = {
         LOBBY: 0,
@@ -11,8 +13,7 @@ export default class Game {
         this.gameState = gameStates.WAITING
 
         this.grid_size
-        this.walls
-        
+        this.walls   
     }
     
 }

@@ -16,6 +16,16 @@ class Tile extends entity {
     }
 }
 
+
+class KeyInputs {
+    constructor() {
+        this.left = false
+        this.right = false
+        this.up = false
+        this.down = false
+    }
+}
+
 class Player extends entity {
 
     static playerStates = {
@@ -25,8 +35,10 @@ class Player extends entity {
 
     constructor(id, name, texture, row, col, size) {
         super(name, false, texture, row, col, size)
+        
         this.id = id
         this.playerState = playerStates.IDLE
+        this.keyinputs = new KeyInputs()
     }
 }
 
