@@ -1,5 +1,4 @@
 const Maze = require('../game_logic/maze.js')
-var map = {}
 const connections = []
 const game = {}
 
@@ -48,11 +47,3 @@ function removeUser(socket) {
     delete connections[socket.id]
 }
 
-function makeMaze(size) {
-    let half_size = size
-    let full_size = 2*half_size+1
-    var m = new Maze(half_size)
-    m.initBlankMaze()
-    m.generateMaze()
-    return m.getObstacleArray()
-}

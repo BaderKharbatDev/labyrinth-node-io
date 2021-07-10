@@ -1,10 +1,8 @@
 export default class board {
-    constructor(canvas_id, board_pixle_size, board_length) {
+    constructor(ctx, board_pixle_size, board_length) {
         this.board_length = board_length
         this.block_size = board_pixle_size/board_length
-        this.game_canvas = document.getElementById(canvas_id)
-        this.ctx = this.game_canvas.getContext('2d')
-        this.game_canvas.width = this.game_canvas.height = board_pixle_size            
+        this.ctx = ctx    
     }
 
     colorBG(color) {

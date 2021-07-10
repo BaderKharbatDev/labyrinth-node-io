@@ -16,6 +16,15 @@ export default class Game {
         this.walls   
     }
 
+    makeMaze(size) {
+        let half_size = size
+        let full_size = 2*half_size+1
+        var m = new Maze(half_size)
+        m.initBlankMaze()
+        m.generateMaze()
+        return m.getObstacleArray()
+    }
+
     removePlayer(socketID) {
         delete this.players[socketID]
     }
