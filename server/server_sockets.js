@@ -1,12 +1,17 @@
 const Maze = require('../game_logic/maze.js')
-const connections = []
-const game = {}
+const Game = require('../game_logic/game.js')
 
 module.exports = function(io) {
+    const manager = new Manager()
 
     io.on('connection', (socket) => {
 
-        addUser(socket)
+        manager.connectUser(socket)
+        if(manager.games.length == 0) {
+            let gameKey = manager.createGame()
+            manager.addUserToGame(gameKey, socketID)
+        }
+
         socket.emit('board-state', map)
 
         //----------Handles User Entry Data i.e. before joining a lobby
@@ -14,7 +19,7 @@ module.exports = function(io) {
 
         })
 
-        //----------Handles starting the game
+        //----------Handles the lobby leader starting the game
         socket.on('game-start', (data)=>{
             
         })
@@ -26,24 +31,50 @@ module.exports = function(io) {
 
 
         socket.on('disconnect', ()=>{
-            removeUser(socket.id)
+            manager.disconnectUser(socket.id)
         })
     });
 }
 
-function addUser(socket) {
-    if(connections.length == 0) {
-        let grid = makeMaze(10)
-        map = {size: grid.length, obstacles: grid}
+class Manager {
+    constructor() {
+        this.connections = []
+        this.games = []
     }
 
-    console.log('A user connected: '+socket.id);
-    connections[socket.id] = socket
+    connectUser(socket) {
+        console.log('A user connected: '+socket.id);
+        connections[socket.id] = socket
+    }
+    
+    disconnectUser(socket) {
+        console.log('A user disconnected: '+socket.id)
+        let playerGameID = this.connections[socket.id].gameKey
+        if(playerGameID != null) {
+            manager.removeUserFromGame(playerGameID, socket.id) //removes player from game
+            if(manager.games[playerGameID].players.length == 0) {
+                delete manager.games[playerGameID]              //deletes game if empty
+            }
+        }
+        delete connections[socket.id]                           //deletes socket from connections
+    }
 
+    createGame() {
+        let temp_id = 1
+        let game = new Game(temp_id)
+        this.games[game.id] = game
+        return game.id
+    }
+
+    addUserToGame(gameKey, socketID) {
+        this.connections[socketID].gameKey = gameKey
+        this.games[gameKey].addPlayer(socketID)
+    }
+
+    removeUserFromGame(gameKey, socketID) {
+        this.games[gameKey].removePlayer(socketID)
+    }
 }
 
-function removeUser(socket) {
-    console.log('A user disconnected: '+socket.id)
-    delete connections[socket.id]
-}
+
 

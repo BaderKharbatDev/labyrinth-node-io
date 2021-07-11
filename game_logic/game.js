@@ -9,7 +9,7 @@ export default class Game {
 
     constructor(id) {
         this.id = id
-        this.players = {}
+        this.players = []
         this.gameState = gameStates.LOBBY
 
         this.grid_size
@@ -44,6 +44,7 @@ export default class Game {
     gameLoop() {
         let tickRate = 1000/200
         while(this.gameState = gameStates.INGAME) {
+            //TODO for each player in game handle their user data
             await this.sleep(tickRate)
         }
     }
