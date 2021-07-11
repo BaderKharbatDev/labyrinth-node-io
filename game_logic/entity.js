@@ -42,4 +42,4 @@ class Player extends entity {
     }
 }
 
-export {Tile as Tile, Player as Player}
+export {Tile as Tile, Player as Player, KeyInputs as KeyInputs}

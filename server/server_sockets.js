@@ -6,17 +6,27 @@ module.exports = function(io) {
 
     io.on('connection', (socket) => {
 
+        //connects and adds a user to game
         manager.connectUser(socket)
-        if(manager.games.length == 0) {
+        if(Object.keys(manager.games).length == 0) {
             let gameKey = manager.createGame()
-            manager.addUserToGame(gameKey, socketID)
+            manager.startGame(gameKey)
+            manager.addUserToGame(gameKey, socket.id)
+        } else {
+            let keyArray = Object.keys(dictionary)
+            let gameKey = manager.games[keyArray[0]]
+            manager.addUserToGame(gameKey, socket.id)
         }
 
         socket.emit('board-state', map)
 
         //----------Handles User Entry Data i.e. before joining a lobby
         socket.on('user-info-data', (data)=>{
-
+            let player = this.connections[socket.id]
+            let gameKey = player.gameKey
+            if(gameKey != null) {
+                this.games[gameKey].handleUserData(socket.id, data.KeyInputs)
+            }
         })
 
         //----------Handles the lobby leader starting the game
@@ -38,8 +48,8 @@ module.exports = function(io) {
 
 class Manager {
     constructor() {
-        this.connections = []
-        this.games = []
+        this.connections = {}
+        this.games = {}
     }
 
     connectUser(socket) {
@@ -52,7 +62,7 @@ class Manager {
         let playerGameID = this.connections[socket.id].gameKey
         if(playerGameID != null) {
             manager.removeUserFromGame(playerGameID, socket.id) //removes player from game
-            if(manager.games[playerGameID].players.length == 0) {
+            if(Object.keys(manager.games[playerGameID].players).length == 0) {
                 delete manager.games[playerGameID]              //deletes game if empty
             }
         }
@@ -64,6 +74,10 @@ class Manager {
         let game = new Game(temp_id)
         this.games[game.id] = game
         return game.id
+    }
+
+    startGame(gameKey) {
+
     }
 
     addUserToGame(gameKey, socketID) {

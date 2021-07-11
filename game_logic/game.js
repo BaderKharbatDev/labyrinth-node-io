@@ -1,4 +1,5 @@
 const Players = require('entity.js').Player
+const KeyInputs = require('entity.js').KeyInputs
 
 export default class Game {
     static gameStates = {
@@ -9,7 +10,7 @@ export default class Game {
 
     constructor(id) {
         this.id = id
-        this.players = []
+        this.players = {}
         this.gameState = gameStates.LOBBY
 
         this.grid_size
@@ -44,7 +45,9 @@ export default class Game {
     gameLoop() {
         let tickRate = 1000/200
         while(this.gameState = gameStates.INGAME) {
-            //TODO for each player in game handle their user data
+            for (const [id, player] of Object.entries(this.players)) {
+                this.updateUserPosition(id, player.keyinputs)
+            }
             await this.sleep(tickRate)
         }
     }
@@ -58,6 +61,10 @@ export default class Game {
     }
 
     handleUserData(socketID, KeyInputs) {
+        this.players[socketID].keyinputs = KeyInputs
+    }
+
+    updateUserPosition(socketID, KeyInputs) {
         const previous_row_pos = this.players[socketID].row
         const previous_col_pos = this.players[socketID].col
         
