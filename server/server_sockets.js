@@ -1,5 +1,6 @@
-const Maze = require('../game_logic/maze.js')
 const Game = require('../game_logic/game.js')
+const Worker = require("tiny-worker");
+
 
 module.exports = function(io) {
     const manager = new Manager()
@@ -8,25 +9,21 @@ module.exports = function(io) {
 
         //connects and adds a user to game
         manager.connectUser(socket)
-        if(Object.keys(manager.games).length == 0) {
+        if(Object.keys(manager.games).length == 0) { //no game in progress
             let gameKey = manager.createGame()
-            manager.startGame(gameKey)
-            manager.addUserToGame(gameKey, socket.id)
+            // manager.startGame(gameKey, io)
+            manager.addUserToGame(gameKey, socket.id) //adds to existing game
         } else {
-            let keyArray = Object.keys(dictionary)
+            let keyArray = Object.keys(manager.games)
             let gameKey = manager.games[keyArray[0]]
             manager.addUserToGame(gameKey, socket.id)
         }
 
-        socket.emit('board-state', map)
+        // socket.emit('board-state', map)
 
         //----------Handles User Entry Data i.e. before joining a lobby
         socket.on('user-info-data', (data)=>{
-            let player = this.connections[socket.id]
-            let gameKey = player.gameKey
-            if(gameKey != null) {
-                this.games[gameKey].handleUserData(socket.id, data.KeyInputs)
-            }
+            
         })
 
         //----------Handles the lobby leader starting the game
@@ -36,7 +33,11 @@ module.exports = function(io) {
 
         //----------Handles User Input during a game
         socket.on('user-input-data', (data)=>{
-
+            let player = this.connections[socket.id]
+            let gameKey = player.gameKey
+            if(gameKey != null) {
+                this.games[gameKey].handleUserData(socket.id, data.KeyInputs)
+            }
         })
 
 
@@ -54,19 +55,19 @@ class Manager {
 
     connectUser(socket) {
         console.log('A user connected: '+socket.id);
-        connections[socket.id] = socket
+        this.connections[socket.id] = socket
     }
     
-    disconnectUser(socket) {
-        console.log('A user disconnected: '+socket.id)
-        let playerGameID = this.connections[socket.id].gameKey
+    disconnectUser(socketID) {
+        console.log('A user disconnected: '+socketID)
+        let playerGameID = this.connections[socketID].gameKey
         if(playerGameID != null) {
-            manager.removeUserFromGame(playerGameID, socket.id) //removes player from game
-            if(Object.keys(manager.games[playerGameID].players).length == 0) {
-                delete manager.games[playerGameID]              //deletes game if empty
+            this.removeUserFromGame(playerGameID, socketID) //removes player from game
+            if(Object.keys(this.games[playerGameID].players).length == 0) {
+                delete this.games[playerGameID]              //deletes game if empty
             }
         }
-        delete connections[socket.id]                           //deletes socket from connections
+        delete this.connections[socketID]                           //deletes socket from connections
     }
 
     createGame() {
@@ -76,8 +77,11 @@ class Manager {
         return game.id
     }
 
-    startGame(gameKey) {
+    startGame(gameKey, io) {
+        let game = this.games[gameKey]
 
+        game.game_process = new Worker(game.gameLoop)
+        game.send_data_process = new Worker(game.sendGameDataLoop)
     }
 
     addUserToGame(gameKey, socketID) {

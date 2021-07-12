@@ -1,7 +1,7 @@
-const Players = require('entity.js').Player
-const KeyInputs = require('entity.js').KeyInputs
+const {Tile, Player, KeyInputs} = require('./entity.js')
+const Maze = require('./maze.js')
 
-export default class Game {
+module.exports = class Game {
     static gameStates = {
         LOBBY: 0,
         INGAME: 1,
@@ -11,7 +11,7 @@ export default class Game {
     constructor(id) {
         this.id = id
         this.players = {}
-        this.gameState = gameStates.LOBBY
+        this.gameState = Game.gameStates.LOBBY
 
         this.grid_size
         this.walls   
@@ -31,7 +31,7 @@ export default class Game {
     }
 
     addPlayer(socketID) {
-        let player = new Players(socketID, "name", null, 1, 1, 0.5)
+        let player = new Player(socketID, "name", null, 1, 1, 0.5)
         this.players[socketID] = player
     }
 
@@ -42,20 +42,22 @@ export default class Game {
     }   
 
     //Handles the game data per tick i.e. moving the player and checking for win condition
-    gameLoop() {
+    async gameLoop() {
         let tickRate = 1000/200
         while(this.gameState = gameStates.INGAME) {
             for (const [id, player] of Object.entries(this.players)) {
                 this.updateUserPosition(id, player.keyinputs)
             }
             await this.sleep(tickRate)
+            console.log('processing game data')
         }
     }
 
     //Handles sending the game data 
-    sendGameData() {
+    async sendGameDataLoop() {
         let tickRate = 1000/40
         while(this.gameState = gameStates.INGAME) {
+            console.log('sending game data')
             await this.sleep(tickRate)
         }
     }

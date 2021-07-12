@@ -37,9 +37,14 @@ class Player extends entity {
         super(name, false, texture, row, col, size)
         
         this.id = id
-        this.playerState = playerStates.IDLE
+        this.playerState = Player.playerStates.IDLE
         this.keyinputs = new KeyInputs()
     }
 }
 
-export {Tile as Tile, Player as Player, KeyInputs as KeyInputs}
+// export {Tile as Tile, Player as Player, KeyInputs as KeyInputs}
+module.exports = {
+    Tile,
+    Player,
+    KeyInputs
+}
