@@ -1,3 +1,4 @@
+const Schedule = require('node-schedule');
 const {Tile, Player, KeyInputs} = require('./entity.js')
 const Maze = require('./maze.js')
 
@@ -40,6 +41,38 @@ module.exports = class Game {
             setTimeout(resolve, ms);
         });
     }   
+
+    startGameProcess() {
+        console.log(this)
+        let game = this
+        const startTime = new Date(Date.now() + 5000);
+        const endTime = new Date(startTime.getTime() + 120000);
+        this.game_loop_process = Schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(game){
+            console.log(game)
+            game.gameLoop()
+        });
+    }
+
+    endGameProcess() {
+        if(this.game_loop_process != null)
+            this.game_loop_process.cancel()
+    }
+
+    startSendingDataLoop() {
+        console.log(this)
+        let game = this
+        const startTime = new Date(Date.now() + 5000);
+        const endTime = new Date(startTime.getTime() + 120000);
+        this.send_data_process = Schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(game){
+            console.log(game)
+            game.sendGameDataLoop()
+        });
+    }
+
+    endDataSendingProcess() {
+        if(this.send_data_process != null)
+            this.send_data_process.cancel()
+    }
 
     //Handles the game data per tick i.e. moving the player and checking for win condition
     async gameLoop() {

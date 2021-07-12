@@ -1,6 +1,4 @@
 const Game = require('../game_logic/game.js')
-const Worker = require("tiny-worker");
-
 
 module.exports = function(io) {
     const manager = new Manager()
@@ -11,7 +9,7 @@ module.exports = function(io) {
         manager.connectUser(socket)
         if(Object.keys(manager.games).length == 0) { //no game in progress
             let gameKey = manager.createGame()
-            // manager.startGame(gameKey, io)
+            manager.startGame(gameKey, io)
             manager.addUserToGame(gameKey, socket.id) //adds to existing game
         } else {
             let keyArray = Object.keys(manager.games)
@@ -80,8 +78,8 @@ class Manager {
     startGame(gameKey, io) {
         let game = this.games[gameKey]
 
-        game.game_process = new Worker(game.gameLoop)
-        game.send_data_process = new Worker(game.sendGameDataLoop)
+        game.startGameProcess()
+        // game.startSendingDataLoop()
     }
 
     addUserToGame(gameKey, socketID) {
