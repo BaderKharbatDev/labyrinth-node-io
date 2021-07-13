@@ -17,8 +17,6 @@ module.exports = function(io) {
             manager.addUserToGame(gameKey, socket.id)
         }
 
-        // socket.emit('board-state', map)
-
         //----------Handles User Entry Data i.e. before joining a lobby
         socket.on('user-info-data', (data)=>{
             
@@ -34,7 +32,7 @@ module.exports = function(io) {
             let player = this.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
-                this.games[gameKey].handleUserData(socket.id, data.KeyInputs)
+                this.games[gameKey].handleUserInputData(socket.id, data.KeyInputs)
             }
         })
 
@@ -77,9 +75,7 @@ class Manager {
 
     startGame(gameKey, io) {
         let game = this.games[gameKey]
-
-        game.startGameProcess()
-        // game.startSendingDataLoop()
+        game.startGame()
     }
 
     addUserToGame(gameKey, socketID) {

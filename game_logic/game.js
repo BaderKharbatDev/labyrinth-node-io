@@ -1,4 +1,4 @@
-const Schedule = require('node-schedule');
+const { fork } = require('child_process');
 const {Tile, Player, KeyInputs} = require('./entity.js')
 const Maze = require('./maze.js')
 
@@ -36,67 +36,38 @@ module.exports = class Game {
         this.players[socketID] = player
     }
 
-    sleep(ms) {
-        return new Promise((resolve) => {
-            setTimeout(resolve, ms);
-        });
-    }   
 
-    startGameProcess() {
-        console.log(this)
-        let game = this
-        const startTime = new Date(Date.now() + 5000);
-        const endTime = new Date(startTime.getTime() + 120000);
-        this.game_loop_process = Schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(game){
-            console.log(game)
-            game.gameLoop()
-        });
-    }
+    // //Handles the game data per tick i.e. moving the player and checking for win condition
+    // async gameLoop() {
+    //     let tickRate = 1000/200
+    //     while(this.gameState = gameStates.INGAME) {
+    //         for (const [id, player] of Object.entries(this.players)) {
+    //             this.updateUserPosition(id, player.keyinputs)
+    //         }
+    //         await this.sleep(tickRate)
+    //         console.log('processing game data')
+    //     }
+    // }
 
-    endGameProcess() {
-        if(this.game_loop_process != null)
-            this.game_loop_process.cancel()
-    }
+    // //Handles sending the game data 
+    // async sendGameDataLoop() {
+    //     let tickRate = 1000/40
+    //     while(this.gameState = gameStates.INGAME) {
+    //         console.log('sending game data')
+    //         await this.sleep(tickRate)
+    //     }
+    // }
 
-    startSendingDataLoop() {
-        console.log(this)
-        let game = this
-        const startTime = new Date(Date.now() + 5000);
-        const endTime = new Date(startTime.getTime() + 120000);
-        this.send_data_process = Schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(game){
-            console.log(game)
-            game.sendGameDataLoop()
-        });
-    }
-
-    endDataSendingProcess() {
-        if(this.send_data_process != null)
-            this.send_data_process.cancel()
-    }
-
-    //Handles the game data per tick i.e. moving the player and checking for win condition
-    async gameLoop() {
-        let tickRate = 1000/200
-        while(this.gameState = gameStates.INGAME) {
-            for (const [id, player] of Object.entries(this.players)) {
-                this.updateUserPosition(id, player.keyinputs)
-            }
-            await this.sleep(tickRate)
-            console.log('processing game data')
-        }
-    }
-
-    //Handles sending the game data 
-    async sendGameDataLoop() {
-        let tickRate = 1000/40
-        while(this.gameState = gameStates.INGAME) {
-            console.log('sending game data')
-            await this.sleep(tickRate)
-        }
-    }
-
-    handleUserData(socketID, KeyInputs) {
+    handleUserInputData(socketID, KeyInputs) {
         this.players[socketID].keyinputs = KeyInputs
+    }
+
+    handleUserPositionData(socketID, row, col, playerState) {
+        if(this.players[socketID]){
+            this.players[socketID].row = row
+            this.players[socketID].col = col
+            this.players[socketID].playerState = playerState
+        }
     }
 
     updateUserPosition(socketID, KeyInputs) {
@@ -124,4 +95,24 @@ module.exports = class Game {
         }
     }
    
+    static game_process_child_commands = {
+        START_GAME: 0
+    }
+
+    static game_process_parent_commands = {
+        UPDATED_USER_POSITION: 0
+    }
+
+    startGame() {
+        const process = fork('./game_logic/processes/execute_game_process.js');
+        process.send({cmd: Game.game_process_child_commands.START_GAME});
+
+        process.on('message', (data) => {
+            switch(data.cmd) {
+                case Game.game_process_parent_commands.UPDATED_USER_POSITION:
+                    this.handleUserPositionData(data.row, data.col, data.playerState)
+                    break;
+            }
+        });
+    }
 }
