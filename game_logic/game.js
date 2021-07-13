@@ -14,8 +14,10 @@ module.exports = class Game {
         this.players = {}
         this.gameState = Game.gameStates.LOBBY
 
-        this.grid_size
-        this.walls   
+        this.grid_size = 9
+        this.walls = this.makeMaze(this.grid_size)
+
+        this.parent_game_process = null
     }
 
     makeMaze(size) {
@@ -29,37 +31,30 @@ module.exports = class Game {
 
     removePlayer(socketID) {
         delete this.players[socketID]
+        this.parent_game_process.send({
+            cmd: Game.game_process_child_commands.USER_REMOVED,
+            id: socketID
+        });
     }
 
     addPlayer(socketID) {
         let player = new Player(socketID, "name", null, 1, 1, 0.5)
         this.players[socketID] = player
+        this.parent_game_process.send({
+            cmd: Game.game_process_child_commands.USER_ADDED,
+            id: socketID,
+            row: player.row,
+            col: player.col,
+            playerState: player.playerState
+        });
     }
 
-
-    // //Handles the game data per tick i.e. moving the player and checking for win condition
-    // async gameLoop() {
-    //     let tickRate = 1000/200
-    //     while(this.gameState = gameStates.INGAME) {
-    //         for (const [id, player] of Object.entries(this.players)) {
-    //             this.updateUserPosition(id, player.keyinputs)
-    //         }
-    //         await this.sleep(tickRate)
-    //         console.log('processing game data')
-    //     }
-    // }
-
-    // //Handles sending the game data 
-    // async sendGameDataLoop() {
-    //     let tickRate = 1000/40
-    //     while(this.gameState = gameStates.INGAME) {
-    //         console.log('sending game data')
-    //         await this.sleep(tickRate)
-    //     }
-    // }
-
     handleUserInputData(socketID, KeyInputs) {
-        this.players[socketID].keyinputs = KeyInputs
+        this.players[socketID].keyinputs = KeyInputs,
+        this.parent_game_process.send({
+            cmd: Game.game_process_child_commands.USER_INPUT,
+            keyinputs: KeyInputs
+        });
     }
 
     handleUserPositionData(socketID, row, col, playerState) {
@@ -69,34 +64,12 @@ module.exports = class Game {
             this.players[socketID].playerState = playerState
         }
     }
-
-    updateUserPosition(socketID, KeyInputs) {
-        const previous_row_pos = this.players[socketID].row
-        const previous_col_pos = this.players[socketID].col
-        
-        this.players[socketID].keyinputs = KeyInputs
-        if(KeyInputs.left && !KeyInputs.right) { //left
-
-        } else if(!KeyInputs.left && KeyInputs.right) { //right
-
-        }
-        if(KeyInputs.up && !KeyInputs.down) { //up
-
-        } else if(!KeyInputs.up && KeyInputs.down) { //down
-
-        }
-
-        const current_row_pos = this.players[socketID].row
-        const current_col_pos = this.players[socketID].col
-        if(previous_col_pos == current_col_pos && previous_row_pos == current_row_pos) {
-            this.players[socketID].playerState = Players.playerStates.RUNNING
-        } else {
-            this.players[socketID].playerState = Players.playerStates.IDLE 
-        }
-    }
    
     static game_process_child_commands = {
-        START_GAME: 0
+        START_GAME: 0,
+        USER_INPUT: 1,
+        USER_ADDED: 2,
+        USER_REMOVED:3
     }
 
     static game_process_parent_commands = {
@@ -104,13 +77,16 @@ module.exports = class Game {
     }
 
     startGame() {
-        const process = fork('./game_logic/processes/execute_game_process.js');
-        process.send({cmd: Game.game_process_child_commands.START_GAME});
+        this.parent_game_process = fork('./game_logic/processes/execute_game_process.js');
+        this.parent_game_process.send({
+            cmd: Game.game_process_child_commands.START_GAME,
+            map: this.walls
+        });
 
-        process.on('message', (data) => {
+        this.parent_game_process.on('message', (data) => {
             switch(data.cmd) {
                 case Game.game_process_parent_commands.UPDATED_USER_POSITION:
-                    this.handleUserPositionData(data.row, data.col, data.playerState)
+                    this.handleUserPositionData(data.id, data.row, data.col, data.playerState)
                     break;
             }
         });
