@@ -14,3 +14,10 @@ socket.on('init-board-state', function(data) {
     client_canvas = new Canvas(data.walls.length) 
     client_canvas.board.paintObstacles(colors.red, data.walls)
 });
+
+socket.on('update-board-state', function(data) {
+    client_canvas.board.colorBG(colors.white) //bg
+    client_canvas.board.paintObstacles(colors.red, data.walls) //walls
+    client_canvas.board.paintPlayers(socket.id, data.players)
+    socket.emit('user-input-data', )
+})

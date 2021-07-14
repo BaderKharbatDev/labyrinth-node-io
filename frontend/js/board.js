@@ -1,3 +1,5 @@
+import {colors} from '/static/js/constants.js'
+
 export default class board {
     constructor(ctx, board_pixle_size, board_length) {
         this.board_length = board_length
@@ -27,6 +29,18 @@ export default class board {
                     this.ctx.fillRect(col*this.block_size-1, row*this.block_size-1, this.block_size+1, this.block_size+1)
                 }
             }
+        }
+    }
+
+    paintPlayers(socketID, players) {
+        for(var key in players) {
+            if(key == socketID) {
+                this.ctx.fillStyle = colors.blue
+            } else {
+                this.ctx.fillStyle = color.yellow
+            }
+            let p = players[key]
+            this.ctx.fillRect(p.col*this.block_size-1, p.row*this.block_size-1, this.block_size/2+1, this.block_size/2+1)
         }
     }
     
