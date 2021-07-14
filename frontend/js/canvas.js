@@ -1,10 +1,20 @@
-import {colors, units} from '/static/js/constants.js'
+import {colors, keys} from '/static/js/constants.js'
 import Board from '/static/js/board.js'
 
 export default class canvas {
+
+    static c = {}
+
     constructor(board_length) {
         let canvas_id = 'canvas'
-        let canvas_pixle_size = 800
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        let canvas_pixle_size
+        if(w > h) {
+            canvas_pixle_size = h
+        } else {
+            canvas_pixle_size = w
+        }
 
         this.game_canvas = document.getElementById(canvas_id)
         this.ctx = this.game_canvas.getContext('2d')
@@ -12,39 +22,46 @@ export default class canvas {
     
         this.board = new Board(this.ctx, canvas_pixle_size, board_length)
         this.board.colorBG(colors.white)
+        this.keyinputs = new KeyInputs()
         document.addEventListener('keydown', this.keydown);
         document.addEventListener('keyup', this.keyup);
+        canvas.c = this
     }
 
 
     keydown(e) {
-        if(e.keyCode == A_KEY){
-            game.singleton.player.keys.a = true
-        } else if(e.keyCode == S_KEY) {
-            game.singleton.player.keys.s = true
-        } else if(e.keyCode == D_KEY) {
-            game.singleton.player.keys.d = true
-        } else if(e.keyCode == W_KEY) {
-            game.singleton.player.keys.w = true
+        if(e.keyCode == keys.a || e.keyCode == keys.left_arrow){
+            canvas.c.keyinputs.left = true
+        } else if(e.keyCode == keys.s || e.keyCode == keys.down_arrow) {
+            canvas.c.keyinputs.down = true
+        } else if(e.keyCode == keys.d || e.keyCode == keys.right_arrow) {
+            canvas.c.keyinputs.right = true
+        } else if(e.keyCode == keys.w || e.keyCode == keys.up_arrow) {
+            canvas.c.keyinputs.up = true
         }
     }
 
     keyup(e) {
-        if(e.keyCode == A_KEY){
-            game.singleton.player.keys.a = false
-        } else if(e.keyCode == S_KEY) {
-            game.singleton.player.keys.s = false
-        } else if(e.keyCode == D_KEY) {
-            game.singleton.player.keys.d = false
-        } else if(e.keyCode == W_KEY) {
-            game.singleton.player.keys.w = false
+        if(e.keyCode == keys.a || e.keyCode == keys.left_arrow){
+            canvas.c.keyinputs.left = false
+        } else if(e.keyCode == keys.s || e.keyCode == keys.down_arrow) {
+            canvas.c.keyinputs.down = false
+        } else if(e.keyCode == keys.d || e.keyCode == keys.right_arrow) {
+            canvas.c.keyinputs.right = false
+        } else if(e.keyCode == keys.w || e.keyCode == keys.up_arrow) {
+            canvas.c.keyinputs.up = false
         }
     }
-
-    
 }
 
-    
+class KeyInputs {
+    constructor() {
+        this.left = false
+        this.right = false
+        this.up = false
+        this.down = false
+    }
+}
 
 
 

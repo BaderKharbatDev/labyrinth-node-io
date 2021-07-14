@@ -22,7 +22,6 @@ process.on('message', async (data) => {
                 col:data.col,
                 playerState:data.playerState
             }
-            console.log('player added: '+ process_helper.players[data.id])
             break;
         case Game.game_process_child_commands.USER_REMOVED:
             delete process_helper.players[data.id]
@@ -66,7 +65,7 @@ async function updateUserPosition(socketID, KeyInputs) {
     const previous_row_pos = process_helper.players[socketID].row
     const previous_col_pos = process_helper.players[socketID].col
     
-    process_helper.players[socketID].keyinputs = KeyInputs
+    // process_helper.players[socketID].keyinputs = KeyInputs
     if(KeyInputs.left && !KeyInputs.right) { //left
 
     } else if(!KeyInputs.left && KeyInputs.right) { //right

@@ -39,7 +39,7 @@ module.exports = function(io) {
             let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
-                manager.games[gameKey].handleUserInputData(socket.id, data.KeyInputs)
+                manager.games[gameKey].handleUserInputData(socket.id, data.keyinputs)
             }
         })
 
