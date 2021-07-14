@@ -35,6 +35,9 @@ module.exports = class Game {
             cmd: Game.game_process_child_commands.USER_REMOVED,
             id: socketID
         });
+        if(this.players.length == 0) {
+            this.parent_game_process.kill()
+        }
     }
 
     addPlayer(socketID) {
@@ -77,6 +80,8 @@ module.exports = class Game {
     }
 
     startGame() {
+        this.gameState == Game.gameStates.INGAME
+
         this.parent_game_process = fork('./game_logic/processes/execute_game_process.js');
         this.parent_game_process.send({
             cmd: Game.game_process_child_commands.START_GAME,

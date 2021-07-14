@@ -9,8 +9,8 @@ socket.on('connect', function(data) {
     console.log('Connected')
 });
 
-socket.on('board-state', function(data) {
+socket.on('init-board-state', function(data) {
     console.log('Received Board State')
-    client_canvas = new Canvas(data.size) 
-    client_canvas.board.paintObstacles(colors.red, data.obstacles)
+    client_canvas = new Canvas(data.walls.length) 
+    client_canvas.board.paintObstacles(colors.red, data.walls)
 });

@@ -39,7 +39,7 @@ async function Loop() {
             for (var id in process_helper.players) {
                 // console.log('K: '+id)
                 // console.log('P: '+ process_helper.players[id])
-                updateUserPosition(id, process_helper.players[id].keyinputs)
+                // updateUserPosition(id, process_helper.players[id].keyinputs)
                 sendParentUpdatedUserPosition(id)
             }
         }

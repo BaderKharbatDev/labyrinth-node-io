@@ -7,15 +7,18 @@ module.exports = function(io) {
 
         //connects and adds a user to game
         manager.connectUser(socket)
+        let gameKey
         if(Object.keys(manager.games).length == 0) { //no game in progress
-            let gameKey = manager.createGame()
+            gameKey = manager.createGame()
             manager.startGame(gameKey, io)
             manager.addUserToGame(gameKey, socket.id) //adds to existing game
         } else {
             let keyArray = Object.keys(manager.games)
-            let gameKey = manager.games[keyArray[0]]
+            gameKey = manager.games[keyArray[0]]
             manager.addUserToGame(gameKey, socket.id)
         }
+        socket.emit('init-board-state', {walls: manager.games[gameKey].walls})
+1
 
         //----------Handles User Entry Data i.e. before joining a lobby
         socket.on('user-info-data', (data)=>{
@@ -24,15 +27,19 @@ module.exports = function(io) {
 
         //----------Handles the lobby leader starting the game
         socket.on('game-start', (data)=>{
-            
+            let player = manager.connections[socket.id]
+            let gameKey = player.gameKey
+            if(gameKey != null) {
+                socket.emit('init-board-state', {walls: manager.games[gameKey].walls})
+            }
         })
 
         //----------Handles User Input during a game
         socket.on('user-input-data', (data)=>{
-            let player = this.connections[socket.id]
+            let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
-                this.games[gameKey].handleUserInputData(socket.id, data.KeyInputs)
+                manager.games[gameKey].handleUserInputData(socket.id, data.KeyInputs)
             }
         })
 

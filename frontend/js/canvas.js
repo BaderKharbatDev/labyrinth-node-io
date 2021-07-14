@@ -8,7 +8,7 @@ export default class canvas {
 
         this.game_canvas = document.getElementById(canvas_id)
         this.ctx = this.game_canvas.getContext('2d')
-        this.game_canvas.width = this.game_canvas.height = board_pixle_size 
+        this.game_canvas.width = this.game_canvas.height = canvas_pixle_size 
     
         this.board = new Board(this.ctx, canvas_pixle_size, board_length)
         this.board.colorBG(colors.white)

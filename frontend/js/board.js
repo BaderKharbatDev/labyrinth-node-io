@@ -7,7 +7,7 @@ export default class board {
 
     colorBG(color) {
         this.ctx.fillStyle = color
-        this.ctx.fillRect(0,0,this.game_canvas.width, this.game_canvas.height)
+        this.ctx.fillRect(0,0,this.block_size*this.board_length, this.block_size*this.board_length)
     }
 
     colorGrid(color) {
