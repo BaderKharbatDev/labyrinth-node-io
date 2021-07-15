@@ -1,11 +1,10 @@
-const io = require('socket.io')(3000);
-const redisAdapter = require('socket.io-redis');
-io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
+var server = require('http').createServer();
+var io = require('socket.io')(server);
+var redis = require('socket.io-redis');
+io.adapter(redis({ host: 'localhost', port: 6379 }));
 
 const Game = require('../game.js')
 const { Player } = require('../entity.js')
-
-
 
 const process_helper = {
     loop_going: true,
