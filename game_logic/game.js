@@ -35,8 +35,13 @@ module.exports = class Game {
             cmd: Game.game_process_child_commands.USER_REMOVED,
             id: socketID
         });
+        this.parent_data_process.send({
+            cmd: Game.game_process_child_commands.USER_REMOVED,
+            id: socketID
+        });
         if(this.players.length == 0) {
             this.parent_game_process.kill()
+            this.parent_data_process.kill()
         }
     }
 
@@ -44,6 +49,13 @@ module.exports = class Game {
         let player = new Player(socketID, "name", null, 1, 1, 0.5)
         this.players[socketID] = player
         this.parent_game_process.send({
+            cmd: Game.game_process_child_commands.USER_ADDED,
+            id: socketID,
+            row: player.row,
+            col: player.col,
+            playerState: player.playerState
+        });
+        this.parent_data_process.send({
             cmd: Game.game_process_child_commands.USER_ADDED,
             id: socketID,
             row: player.row,
@@ -62,17 +74,28 @@ module.exports = class Game {
 
     handleUserPositionData(socketID, row, col, playerState) {
         if(this.players[socketID]){
+            if(this.players[socketID].row == row && this.players[socketID].col == col) return
+
             this.players[socketID].row = row
             this.players[socketID].col = col
             this.players[socketID].playerState = playerState
-        }
+
+            this.parent_data_process.send({
+                cmd: Game.game_process_child_commands.USER_POSITION,
+                id: socketID,
+                row: row,
+                col: col,
+                playerState: playerState
+            });
+        }   
     }
    
     static game_process_child_commands = {
         START_GAME: 0,
         USER_INPUT: 1,
         USER_ADDED: 2,
-        USER_REMOVED:3
+        USER_REMOVED:3,
+        USER_POSITION: 4
     }
 
     static game_process_parent_commands = {
@@ -82,6 +105,7 @@ module.exports = class Game {
     startGame() {
         this.gameState == Game.gameStates.INGAME
 
+        // GAME LOOP
         this.parent_game_process = fork('./game_logic/processes/execute_game_process.js');
         this.parent_game_process.send({
             cmd: Game.game_process_child_commands.START_GAME,
@@ -94,6 +118,12 @@ module.exports = class Game {
                     this.handleUserPositionData(data.id, data.row, data.col, data.playerState)
                     break;
             }
+        });
+
+        // USER DATA LOOP
+        this.parent_data_process = fork('./game_logic/processes/execute_user_data_process.js');
+        this.parent_data_process.send({
+            cmd: Game.game_process_child_commands.START_GAME,
         });
     }
 }

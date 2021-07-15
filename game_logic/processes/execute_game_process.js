@@ -49,6 +49,7 @@ async function Loop() {
 async function sendParentUpdatedUserPosition(id) {
     process.send({
         cmd: Game.game_process_parent_commands.UPDATED_USER_POSITION,
+        id: id,
         row: process_helper.players[id].row,
         col: process_helper.players[id].col
     });

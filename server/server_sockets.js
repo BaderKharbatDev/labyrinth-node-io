@@ -80,7 +80,7 @@ class Manager {
         return game.id
     }
 
-    startGame(gameKey, io) {
+    startGame(gameKey) {
         let game = this.games[gameKey]
         game.startGame()
     }
