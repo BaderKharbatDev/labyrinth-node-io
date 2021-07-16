@@ -16,6 +16,7 @@ export default class canvas {
             canvas_pixle_size = w
         }
 
+        document.addEventListener('contextmenu', event => event.preventDefault());
         this.game_canvas = document.getElementById(canvas_id)
         this.ctx = this.game_canvas.getContext('2d')
         this.game_canvas.width = this.game_canvas.height = canvas_pixle_size 

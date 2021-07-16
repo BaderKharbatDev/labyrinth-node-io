@@ -66,16 +66,27 @@ async function updateUserPosition(socketID, KeyInputs) {
     const previous_row_pos = process_helper.players[socketID].row
     const previous_col_pos = process_helper.players[socketID].col
     
-    let dist = 0.2
+    let dist = 0.1
+    let new_col, new_row
+
     if(KeyInputs.left && !KeyInputs.right) { //left
-        process_helper.players[socketID].col -= dist
+        new_col = process_helper.players[socketID].col - dist
     } else if(!KeyInputs.left && KeyInputs.right) { //right
-        process_helper.players[socketID].col += dist
+        new_col = process_helper.players[socketID].col + dist
     }
+
+    if(new_col && !isPositionCollidingWithMap(process_helper.players[socketID].row, new_col)) {
+        process_helper.players[socketID].col = new_col
+    }
+
     if(KeyInputs.up && !KeyInputs.down) { //up
-        process_helper.players[socketID].row -= dist
+        new_row = process_helper.players[socketID].row - dist
     } else if(!KeyInputs.up && KeyInputs.down) { //down
-        process_helper.players[socketID].row += dist
+        new_row = process_helper.players[socketID].row + dist
+    }
+
+    if(new_row && !isPositionCollidingWithMap(new_row, process_helper.players[socketID].col)) {
+        process_helper.players[socketID].row = new_row
     }
 
     const current_row_pos = process_helper.players[socketID].row
@@ -86,4 +97,39 @@ async function updateUserPosition(socketID, KeyInputs) {
     } else {
         process_helper.players[socketID].playerState = Player.playerStates.IDLE 
     }
+}
+
+function isPositionCollidingWithMap(row, col) {
+    let player_size = 0.5, block_size = 1
+    
+    for(var r = 0; r < process_helper.map.length; r++) {
+        for(var c = 0; c < process_helper.map.length; c++) {
+            if(process_helper.map[r][c] == true) {
+                if(Intersect({
+                    x: col,
+                    y: row,
+                    height: player_size,
+                    width: player_size
+                },{
+                    x: c,
+                    y: r,
+                    height: block_size,
+                    width: block_size
+                })) {
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}
+
+function Intersect(rect1,rect2) {
+    if (rect1.x < rect2.x + rect2.width &&
+        rect1.x + rect1.width > rect2.x &&
+        rect1.y < rect2.y + rect2.height &&
+        rect1.y + rect1.height > rect2.y) {
+         return true
+     }
+     return false
 }
