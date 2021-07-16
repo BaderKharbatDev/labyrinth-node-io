@@ -14,13 +14,16 @@ process.on('message', async (data) => {
             Loop()
             break;
         case Game.game_process_child_commands.USER_INPUT:
-            process_helper.players[data.id].keyinputs = data.keyinputs
+            if(process_helper.players[data.id]) {
+                process_helper.players[data.id].keyinputs = data.keyinputs
+            }
             break;
         case Game.game_process_child_commands.USER_ADDED:
             process_helper.players[data.id] = {
                 row:data.row,
                 col:data.col,
-                playerState:data.playerState
+                playerState:data.playerState,
+                keyinputs: data.keyinputs
             }
             break;
         case Game.game_process_child_commands.USER_REMOVED:
@@ -34,11 +37,8 @@ async function Loop() {
     let tickRate = second/200
     while(process_helper.loop_going) {
         if(Object.keys(process_helper.players).length != 0) {
-            // console.log('len: '+Object.keys(process_helper.players).length)
             for (var id in process_helper.players) {
-                // console.log('K: '+id)
-                // console.log('P: '+ process_helper.players[id])
-                // updateUserPosition(id, process_helper.players[id].keyinputs)
+                updateUserPosition(id, process_helper.players[id].keyinputs)
                 sendParentUpdatedUserPosition(id)
             }
         }

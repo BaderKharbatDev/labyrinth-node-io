@@ -53,7 +53,8 @@ module.exports = class Game {
             id: socketID,
             row: player.row,
             col: player.col,
-            playerState: player.playerState
+            playerState: player.playerState,
+            keyinputs: player.keyinputs
         });
         this.parent_data_process.send({
             cmd: Game.game_process_child_commands.USER_ADDED,
