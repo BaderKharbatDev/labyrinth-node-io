@@ -8,12 +8,14 @@ const { Player } = require('../entity.js')
 
 const process_helper = {
     loop_going: true,
-    players: {}
+    players: {},
+    map: {}
 }
 
 process.on('message', async (data) => {
     switch(data.cmd) {
         case Game.game_process_child_commands.START_GAME:
+            process_helper.map = data.map
             Loop()
             break;
         case Game.game_process_child_commands.USER_POSITION:
@@ -39,7 +41,10 @@ async function Loop() {
     let tickRate = second/40
     while(process_helper.loop_going) {
         if(Object.keys(process_helper.players).length != 0) {
-            // io.emit('update-board-state', {players: process_helper.players})
+            io.emit('update-board-state', {
+                players: process_helper.players,
+                walls: process_helper.map
+            })
         }
         await sleep(tickRate)
     }

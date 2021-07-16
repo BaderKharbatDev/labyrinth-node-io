@@ -124,6 +124,7 @@ module.exports = class Game {
         this.parent_data_process = fork('./game_logic/processes/execute_user_data_process.js');
         this.parent_data_process.send({
             cmd: Game.game_process_child_commands.START_GAME,
+            map: this.walls
         });
     }
 }
