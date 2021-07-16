@@ -63,23 +63,34 @@ function sleep(ms) {
 }
 
 async function updateUserPosition(socketID, KeyInputs) {
+    console.log(KeyInputs)
+
     const previous_row_pos = process_helper.players[socketID].row
     const previous_col_pos = process_helper.players[socketID].col
+
+    // console.log(previous_col_pos+' / '+previous_row_pos)
     
     // process_helper.players[socketID].keyinputs = KeyInputs
     if(KeyInputs.left && !KeyInputs.right) { //left
-
+        process_helper.players[socketID].col -= 1
+        console.log('A')
     } else if(!KeyInputs.left && KeyInputs.right) { //right
-
+        process_helper.players[socketID].col += 1
+        console.log('B')
     }
     if(KeyInputs.up && !KeyInputs.down) { //up
-
+        process_helper.players[socketID].row -= 1
+        console.log('C')
     } else if(!KeyInputs.up && KeyInputs.down) { //down
-
+        process_helper.players[socketID].row += 1
+        console.log('D')
     }
 
     const current_row_pos = process_helper.players[socketID].row
     const current_col_pos = process_helper.players[socketID].col
+
+    // console.log(current_col_pos+' / '+current_row_pos)
+
     if(previous_col_pos == current_col_pos && previous_row_pos == current_row_pos) {
         process_helper.players[socketID].playerState = Player.playerStates.RUNNING
     } else {
