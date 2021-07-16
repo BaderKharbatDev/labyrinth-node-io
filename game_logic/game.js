@@ -69,6 +69,7 @@ module.exports = class Game {
         this.players[socketID].keyinputs = KeyInputs,
         this.parent_game_process.send({
             cmd: Game.game_process_child_commands.USER_INPUT,
+            id: socketID,
             keyinputs: KeyInputs
         });
     }
