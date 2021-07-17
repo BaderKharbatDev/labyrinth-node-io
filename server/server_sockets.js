@@ -7,21 +7,22 @@ module.exports = function(io) {
 
         //connects and adds a user to game
         manager.connectUser(socket)
-        // let gameKey
-        // if(Object.keys(manager.games).length == 0) { //no game in progress
-        //     gameKey = manager.createGame()
-        //     manager.startGame(gameKey, io)
-        //     manager.addUserToGame(gameKey, socket.id) //adds to existing game
-        // } else {
-        //     let keyArray = Object.keys(manager.games)
-        //     gameKey = manager.games[keyArray[0]].id
-        //     manager.addUserToGame(gameKey, socket.id)
-        // }
-        // socket.emit('init-board-state', {walls: manager.games[gameKey].walls})
 
-        //----------Handles User Entry Data i.e. before joining a lobby
-        socket.on('user-info-data', (data)=>{
-            
+        //----------Handles when a user joins a global game
+        socket.on('payer-join-global-game', (data)=> {
+            let player_name = data.name
+
+            let gameKey
+            if(Object.keys(manager.games).length == 0) { //no game in progress
+                gameKey = manager.createGame()
+                manager.startGame(gameKey, io)
+            } else {
+                let keyArray = Object.keys(manager.games)
+                gameKey = manager.games[keyArray[0]].id
+            }
+            manager.addUserToGame(gameKey, socket.id)
+            socket.join(gameKey.toString())
+            io.to(gameKey.toString()).emit('init-board-state', {walls: manager.games[gameKey].walls})
         })
 
         //----------Handles the lobby leader starting the game
@@ -29,7 +30,7 @@ module.exports = function(io) {
             let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
-                socket.emit('init-board-state', {walls: manager.games[gameKey].walls})
+                io.to(gameKey.toString()).emit('init-board-state', {walls: manager.games[gameKey].walls})
             }
         })
 
@@ -50,6 +51,8 @@ module.exports = function(io) {
 }
 
 class Manager {
+    static game_id_counter = 1
+
     constructor() {
         this.connections = {}
         this.games = {}
@@ -73,7 +76,9 @@ class Manager {
     }
 
     createGame() {
-        let temp_id = 1
+        let temp_id = Manager.game_id_counter
+        Manager.game_id_counter++
+
         let game = new Game(temp_id)
         this.games[game.id] = game
         return game.id
