@@ -38,7 +38,7 @@ async function Loop() {
     while(process_helper.loop_going) {
         if(Object.keys(process_helper.players).length != 0) {
             for (var id in process_helper.players) {
-                updateUserPosition(id, process_helper.players[id].keyinputs)
+                updateUserPosition(id, process_helper.players[id].keyinputs, tickRate)
                 sendParentUpdatedUserPosition(id)
             }
         }
@@ -62,11 +62,13 @@ function sleep(ms) {
     });
 }
 
-async function updateUserPosition(socketID, KeyInputs) {
+async function updateUserPosition(socketID, KeyInputs, tick_rate) {
     const previous_row_pos = process_helper.players[socketID].row
     const previous_col_pos = process_helper.players[socketID].col
     
-    let dist = 0.1
+    let dps = 20
+    let dist = dps*2 * (tick_rate/1000)
+
     let new_col, new_row
 
     if(KeyInputs.left && !KeyInputs.right) { //left

@@ -37,7 +37,7 @@ export default class board {
             if(key == socketID) {
                 this.ctx.fillStyle = colors.blue
             } else {
-                this.ctx.fillStyle = color.yellow
+                this.ctx.fillStyle = colors.yellow
             }
             let p = players[key]
             this.ctx.fillRect(p.col*this.block_size-1, p.row*this.block_size-1, this.block_size/2+1, this.block_size/2+1)

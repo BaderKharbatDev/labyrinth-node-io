@@ -14,7 +14,7 @@ module.exports = function(io) {
             manager.addUserToGame(gameKey, socket.id) //adds to existing game
         } else {
             let keyArray = Object.keys(manager.games)
-            gameKey = manager.games[keyArray[0]]
+            gameKey = manager.games[keyArray[0]].id
             manager.addUserToGame(gameKey, socket.id)
         }
         socket.emit('init-board-state', {walls: manager.games[gameKey].walls})
