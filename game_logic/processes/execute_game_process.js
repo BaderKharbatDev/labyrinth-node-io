@@ -103,9 +103,10 @@ async function updateUserPosition(socketID, KeyInputs, tick_rate) {
 
 function isPositionCollidingWithMap(row, col) {
     let player_size = 0.5, block_size = 1
+    let rounded_row = Math.floor(row), rounded_col = Math.floor(col)
     
-    for(var r = 0; r < process_helper.map.length; r++) {
-        for(var c = 0; c < process_helper.map.length; c++) {
+    for(var r = rounded_row-1; r <= rounded_row+1; r++) {
+        for(var c = rounded_col-1; c <= rounded_col+1; c++) {
             if(process_helper.map[r][c] == true) {
                 if(Intersect({
                     x: col,
