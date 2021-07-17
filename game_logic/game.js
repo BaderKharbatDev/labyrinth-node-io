@@ -45,8 +45,8 @@ module.exports = class Game {
         }
     }
 
-    addPlayer(socketID) {
-        let player = new Player(socketID, "name", null, 1, 1, 0.5)
+    addPlayer(socketID, player_name) {
+        let player = new Player(socketID, player_name, null, 1, 1, 0.5)
         this.players[socketID] = player
         this.parent_game_process.send({
             cmd: Game.game_process_child_commands.USER_ADDED,
@@ -61,6 +61,7 @@ module.exports = class Game {
             id: socketID,
             row: player.row,
             col: player.col,
+            name: player.name,
             playerState: player.playerState
         });
     }

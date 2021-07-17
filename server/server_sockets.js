@@ -9,7 +9,7 @@ module.exports = function(io) {
         manager.connectUser(socket)
 
         //----------Handles when a user joins a global game
-        socket.on('payer-join-global-game', (data)=> {
+        socket.on('player-join-global-game', (data)=> {
             let player_name = data.name
 
             let gameKey
@@ -20,7 +20,7 @@ module.exports = function(io) {
                 let keyArray = Object.keys(manager.games)
                 gameKey = manager.games[keyArray[0]].id
             }
-            manager.addUserToGame(gameKey, socket.id)
+            manager.addUserToGame(gameKey, socket.id, player_name)
             socket.join(gameKey.toString())
             io.to(gameKey.toString()).emit('init-board-state', {walls: manager.games[gameKey].walls})
         })
@@ -89,9 +89,9 @@ class Manager {
         game.startGame()
     }
 
-    addUserToGame(gameKey, socketID) {
+    addUserToGame(gameKey, socketID, player_name) {
         this.connections[socketID].gameKey = gameKey
-        this.games[gameKey].addPlayer(socketID)
+        this.games[gameKey].addPlayer(socketID, player_name)
     }
 
     removeUserFromGame(gameKey, socketID) {

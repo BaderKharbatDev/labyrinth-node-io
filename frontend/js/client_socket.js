@@ -1,8 +1,7 @@
 import Canvas from '/static/js/canvas.js'
 import {colors, units} from '/static/js/constants.js'
 
-var socket = io.connect();
-
+const socket = io.connect();
 let client_canvas = {}
 
 socket.on('connect', function(data) {
@@ -21,3 +20,24 @@ socket.on('update-board-state', function(data) {
     client_canvas.board.paintPlayers(socket.id, data.players)
     socket.emit('user-input-data', {keyinputs: client_canvas.keyinputs})
 })
+
+//webpage control, replace later
+var x = document.getElementById("canvas-section");
+var y = document.getElementById("login-form-section");
+x.style.display = "none"
+function toggleSections() {
+    y.style.display = "none"
+    x.style.display = "block"
+} 
+
+//on click of the "PLAY" button
+function joinGlobalGame() {
+    let name = document.getElementById("player_name").value;
+    if(name && name.length >=1) {
+        socket.emit('player-join-global-game', {
+            name: name
+        })
+        toggleSections()
+    }
+}
+document.getElementById("join_global_button").onclick = joinGlobalGame;

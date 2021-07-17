@@ -27,6 +27,7 @@ process.on('message', async (data) => {
             break;
         case Game.game_process_child_commands.USER_ADDED:
             process_helper.players[data.id] = {
+                name:data.name,
                 row:data.row,
                 col:data.col,
                 playerState:data.playerState

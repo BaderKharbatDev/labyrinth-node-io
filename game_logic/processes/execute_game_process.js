@@ -107,20 +107,24 @@ function isPositionCollidingWithMap(row, col) {
     
     for(var r = rounded_row-1; r <= rounded_row+1; r++) {
         for(var c = rounded_col-1; c <= rounded_col+1; c++) {
-            if(process_helper.map[r][c] == true) {
-                if(Intersect({
-                    x: col,
-                    y: row,
-                    height: player_size,
-                    width: player_size
-                },{
-                    x: c,
-                    y: r,
-                    height: block_size,
-                    width: block_size
-                })) {
-                    return true
+            try {
+                if(process_helper.map[r][c] == true) {
+                    if(Intersect({
+                        x: col,
+                        y: row,
+                        height: player_size,
+                        width: player_size
+                    },{
+                        x: c,
+                        y: r,
+                        height: block_size,
+                        width: block_size
+                    })) {
+                        return true
+                    }
                 }
+            } catch(err) {
+                continue
             }
         }
     }

@@ -12,15 +12,6 @@
                 text-align: center;
             }
         </style>
-        <script>
-                var x = document.getElementById("canvas-section");
-                var y = document.getElementById("login-form-section");
-                y.style.display = "none"
-            function toggleSections() {
-                x.style.display = "none"
-                y.style.display = "block"
-            } 
-        </script>
     </head>
     <body>
         <section id="canvas-section">
@@ -29,10 +20,11 @@
             </div>
         </section>
 
-        <section id="login-form-section">
-            <input type="text" id="fname" name="fname"><br><br>
-            <button>Play</button><br>
+        <section id="login-form-section" style="margin-top: 100px;">
+            <input type="text" id="player_name"><br><br>
+            <button type="button" onclick="toggleSections()" id="join_global_button">Play</button><br>
             <button>Make Room</button>
         </section>
     </body>
+
 </html>
