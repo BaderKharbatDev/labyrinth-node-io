@@ -14,7 +14,7 @@ module.exports = class Game {
         this.players = {}
         this.gameState = Game.gameStates.LOBBY
 
-        this.grid_size = 15
+        this.grid_size = 10
         this.walls = this.makeMaze(this.grid_size)
 
         this.parent_game_process = null

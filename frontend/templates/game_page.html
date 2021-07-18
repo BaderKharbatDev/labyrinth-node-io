@@ -14,16 +14,26 @@
         </style>
     </head>
     <body>
+        <section>
+            <h1>LABYRINTH.IO</h1>
+        </section>
         <section id="canvas-section">
             <div>
                 <canvas id="canvas"></canvas>
             </div>
         </section>
 
-        <section id="login-form-section" style="margin-top: 100px;">
-            <input type="text" id="player_name"><br><br>
+        <section id="login-form-section" style="margin-top: 75px;">
+            <input type="text" id="player_name" placeholder="Enter Name"><br><br>
             <button type="button" onclick="toggleSections()" id="join_global_button">Play</button><br>
             <button>Make Room</button>
+        </section>
+
+        <section id="lobby-section">
+            <h2>Players</h2>
+            <ul id="player-list"></ul>
+            Game Mode: <p id="game-mode-text"></p>
+            <button id="start-lobby"></button>
         </section>
     </body>
 
