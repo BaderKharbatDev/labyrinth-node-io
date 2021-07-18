@@ -110,7 +110,7 @@ module.exports = class Game {
     }
 
     startGame() {
-        this.gameState == Game.gameStates.INGAME
+        this.gameState = Game.gameStates.INGAME
 
         // GAME LOOP
         this.parent_game_process = fork('./game_logic/processes/execute_game_process.js');
