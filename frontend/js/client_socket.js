@@ -21,13 +21,23 @@ socket.on('update-board-state', function(data) {
     socket.emit('user-input-data', {keyinputs: client_canvas.keyinputs})
 })
 
-//webpage control, replace later
+//-------------webpage control, replace later
 var x = document.getElementById("canvas-section");
 var y = document.getElementById("login-form-section");
+var z = document.getElementById('lobby-section');
 x.style.display = "none"
-function toggleSections() {
+z.style.display = "none"
+
+function toggleCanvasSection() {
     y.style.display = "none"
+    z.style.display = "none"
     x.style.display = "block"
+}
+
+function toggleLobbySection() {
+    y.style.display = "none"
+    z.style.display = "block"
+    x.style.display = "none"
 } 
 
 //on click of the "PLAY" button
@@ -37,7 +47,20 @@ function joinGlobalGame() {
         socket.emit('player-join-global-game', {
             name: name
         })
-        toggleSections()
+        toggleCanvasSection()
     }
 }
+
+function joinPrivateGame() {
+    let name = document.getElementById("player_name").value;
+    if(name && name.length >=1) {
+        socket.emit('player-join-private-game', {
+            name: name
+        })
+        toggleLobbySection()
+    }
+}
+
 document.getElementById("join_global_button").onclick = joinGlobalGame;
+document.getElementById("join_private_button").onclick = joinPrivateGame;
+

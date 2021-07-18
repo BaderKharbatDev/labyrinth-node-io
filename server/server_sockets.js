@@ -15,14 +15,22 @@ module.exports = function(io) {
             let gameKey
             if(Object.keys(manager.games).length == 0) { //no game in progress
                 gameKey = manager.createGame()
-                manager.startGame(gameKey, io)
+                manager.startGame(gameKey)
             } else {
                 let keyArray = Object.keys(manager.games)
                 gameKey = manager.games[keyArray[0]].id
             }
             manager.addUserToGame(gameKey, socket.id, player_name)
             socket.join(gameKey.toString())
-            io.to(gameKey.toString()).emit('init-board-state', {walls: manager.games[gameKey].walls})
+        })
+
+        //----------Handles when a user creates a private game
+        socket.on('player-join-private-game', (data)=> {
+            let player_name = data.name
+            let gameKey = manager.createGame()
+  
+            manager.addUserToGame(gameKey, socket.id, player_name)
+            socket.join(gameKey.toString())
         })
 
         //----------Handles the lobby leader starting the game

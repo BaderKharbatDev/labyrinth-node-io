@@ -11,6 +11,7 @@ process.on('message', async (data) => {
     switch(data.cmd) {
         case Game.game_process_child_commands.START_GAME:
             process_helper.map = data.map
+            process_helper.gameKey = data.gameKey
             Loop()
             break;
         case Game.game_process_child_commands.USER_INPUT:
@@ -66,7 +67,7 @@ async function updateUserPosition(socketID, KeyInputs, tick_rate) {
     const previous_row_pos = process_helper.players[socketID].row
     const previous_col_pos = process_helper.players[socketID].col
     
-    let dps = 20
+    let dps = 10//20
     let dist = dps*2 * (tick_rate/1000)
 
     let new_col, new_row

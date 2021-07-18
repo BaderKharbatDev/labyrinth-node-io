@@ -31,39 +31,43 @@ module.exports = class Game {
 
     removePlayer(socketID) {
         delete this.players[socketID]
-        this.parent_game_process.send({
-            cmd: Game.game_process_child_commands.USER_REMOVED,
-            id: socketID
-        });
-        this.parent_data_process.send({
-            cmd: Game.game_process_child_commands.USER_REMOVED,
-            id: socketID
-        });
-        if(this.players.length == 0) {
-            this.parent_game_process.kill()
-            this.parent_data_process.kill()
+        if(this.gameState == Game.gameStates.INGAME) { //IF IN GAME SEND PLAYER DATA
+            this.parent_game_process.send({
+                cmd: Game.game_process_child_commands.USER_REMOVED,
+                id: socketID
+            });
+            this.parent_data_process.send({
+                cmd: Game.game_process_child_commands.USER_REMOVED,
+                id: socketID
+            });
+            if(this.players.length == 0) { ///KILLS GAME PROCESSES
+                this.parent_game_process.kill()
+                this.parent_data_process.kill()
+            }
         }
     }
 
     addPlayer(socketID, player_name) {
         let player = new Player(socketID, player_name, null, 1, 1, 0.5)
         this.players[socketID] = player
-        this.parent_game_process.send({
-            cmd: Game.game_process_child_commands.USER_ADDED,
-            id: socketID,
-            row: player.row,
-            col: player.col,
-            playerState: player.playerState,
-            keyinputs: player.keyinputs
-        });
-        this.parent_data_process.send({
-            cmd: Game.game_process_child_commands.USER_ADDED,
-            id: socketID,
-            row: player.row,
-            col: player.col,
-            name: player.name,
-            playerState: player.playerState
-        });
+        if(this.gameState == Game.gameStates.INGAME) {
+            this.parent_game_process.send({
+                cmd: Game.game_process_child_commands.USER_ADDED,
+                id: socketID,
+                row: player.row,
+                col: player.col,
+                playerState: player.playerState,
+                keyinputs: player.keyinputs
+            });
+            this.parent_data_process.send({
+                cmd: Game.game_process_child_commands.USER_ADDED,
+                id: socketID,
+                row: player.row,
+                col: player.col,
+                name: player.name,
+                playerState: player.playerState
+            });
+        }
     }
 
     handleUserInputData(socketID, KeyInputs) {
@@ -112,7 +116,8 @@ module.exports = class Game {
         this.parent_game_process = fork('./game_logic/processes/execute_game_process.js');
         this.parent_game_process.send({
             cmd: Game.game_process_child_commands.START_GAME,
-            map: this.walls
+            map: this.walls,
+            gameKey: this.id
         });
 
         this.parent_game_process.on('message', (data) => {

@@ -32,6 +32,7 @@ process.on('message', async (data) => {
                 col:data.col,
                 playerState:data.playerState
             }
+            io.to(data.id).emit('init-board-state', {walls: process_helper.map})
             break;
         case Game.game_process_child_commands.USER_REMOVED:
             delete process_helper.players[data.id]
