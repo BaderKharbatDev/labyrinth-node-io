@@ -8,14 +8,7 @@ socket.on('connect', function(data) {
     console.log('Connected')
 });
 
-// socket.on('init-board-state', function(data) {
-//     console.log('Received Board State')
-//     client_canvas.board.paintObstacles(colors.red, data.walls)
-// });
-
 socket.on('update-board-state', function(data) {
-    console.log('Updating board state')
-
     if(!client_canvas) {
         client_canvas = new Canvas(data.walls.length) 
     }
@@ -23,6 +16,21 @@ socket.on('update-board-state', function(data) {
     client_canvas.board.paintObstacles(colors.red, data.walls) //walls
     client_canvas.board.paintPlayers(socket.id, data.players)
     socket.emit('user-input-data', {keyinputs: client_canvas.keyinputs})
+})
+
+socket.on('update-lobby', function(data){
+    let ul = document.getElementById("lobby-player-list")
+    ul.innerHTML = "";
+    for (var key in data.players){
+        let player = data.players[key]
+        let li = document.createElement('li');
+        ul.appendChild(li);
+        li.innerHTML += player.name;   
+    }
+})
+
+socket.on('lobby-game-starting', function(data) {
+
 })
 
 //-------------webpage control, replace later

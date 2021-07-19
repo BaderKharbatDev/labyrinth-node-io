@@ -27,10 +27,11 @@ module.exports = function(io) {
         //----------Handles when a user creates a private game
         socket.on('player-join-private-game', (data)=> {
             let player_name = data.name
-            let gameKey = manager.createGame()
+            let gameKey = manager.createGame() //creates game
   
             manager.addUserToGame(gameKey, socket.id, player_name)
-            socket.join(gameKey.toString())
+            socket.join(gameKey.toString()) //adds user to game
+            io.to(socket.id).emit('update-lobby', {players: manager.games[gameKey].players})
         })
 
         //----------Handles the lobby leader starting the game

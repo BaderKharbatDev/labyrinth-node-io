@@ -11,6 +11,17 @@
                 margin: 0;
                 text-align: center;
             }
+
+            ul {
+                display: table;
+                margin: 0 auto;
+                margin-top: 20px;
+            }
+
+            p, button {
+                margin-top: 20px;
+            }
+
         </style>
     </head>
     <body>
@@ -24,15 +35,15 @@
         </section>
 
         <section id="login-form-section" style="margin-top: 75px;">
-            <input type="text" id="player_name" placeholder="Enter Name"><br><br>
-            <button type="button" id="join_global_button">Play</button><br>
+            <input type="text" id="player_name" placeholder="Enter Name"><br>
+            <button type="button" id="join_global_button">Play</button>
             <button id="join_private_button">Make Room</button>
         </section>
 
         <section id="lobby-section">
             Players
-            <ul id="player-list"></ul>
-            Game Mode: <p id="game-mode-text"></p>
+            <ul id="lobby-player-list" class="table"></ul>
+            <p>Game Mode: Classic</p>
             <button id="start-lobby">Start Game</button>
         </section>
     </body>
