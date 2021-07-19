@@ -18,6 +18,19 @@ process.on('message', async (data) => {
         case Game.game_process_child_commands.START_GAME:
             process_helper.map = data.map
             process_helper.gameKey = data.gameKey
+            if(data.players) {
+                let keys =  Object.keys(data.players)
+                for(var i = 0; i < keys.length; i++) {
+                    let player = data.players[keys[i]]
+                    process_helper.players[player.id] = {
+                        name:player.name,
+                        row:player.row,
+                        col:player.col,
+                        playerState:player.playerState,
+                        keyinputs: player.keyinputs
+                    }
+                }
+            }
             Loop()
             break;
         case Game.game_process_child_commands.USER_POSITION:
@@ -43,12 +56,12 @@ async function Loop() {
     let second = 1000
     let tickRate = second/40
     while(process_helper.loop_going) {
-        if(Object.keys(process_helper.players).length != 0) {
+        // if(Object.keys(process_helper.players).length != 0) {
             io.to(process_helper.gameKey.toString()).emit('update-board-state', {
                 players: process_helper.players,
                 walls: process_helper.map
             })
-        }
+        // }
         await sleep(tickRate)
     }
 }

@@ -39,7 +39,8 @@ module.exports = function(io) {
             let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
-                io.to(gameKey.toString()).emit('init-board-state', {walls: manager.games[gameKey].walls})
+                manager.startGame(gameKey)
+                io.to(gameKey.toString()).emit('lobby-game-starting', {})
             }
         })
 

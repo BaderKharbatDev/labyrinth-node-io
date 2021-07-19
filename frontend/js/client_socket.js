@@ -30,7 +30,7 @@ socket.on('update-lobby', function(data){
 })
 
 socket.on('lobby-game-starting', function(data) {
-
+    toggleCanvasSection()
 })
 
 //-------------webpage control, replace later
@@ -73,6 +73,11 @@ function joinPrivateGame() {
     }
 }
 
+function startPrivateGame() {
+    socket.emit('game-start')
+}
+
 document.getElementById("join_global_button").onclick = joinGlobalGame;
 document.getElementById("join_private_button").onclick = joinPrivateGame;
+document.getElementById("start-lobby").onclick = startPrivateGame;
 

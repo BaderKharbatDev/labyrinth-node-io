@@ -117,7 +117,8 @@ module.exports = class Game {
         this.parent_game_process.send({
             cmd: Game.game_process_child_commands.START_GAME,
             map: this.walls,
-            gameKey: this.id
+            gameKey: this.id,
+            players: this.players
         });
 
         this.parent_game_process.on('message', (data) => {
@@ -133,7 +134,8 @@ module.exports = class Game {
         this.parent_data_process.send({
             cmd: Game.game_process_child_commands.START_GAME,
             map: this.walls,
-            gameKey: this.id
+            gameKey: this.id,
+            players: this.players
         });
     }
 }
