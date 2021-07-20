@@ -36,14 +36,15 @@
 
         <section id="login-form-section" style="margin-top: 75px;">
             <input type="text" id="player_name" placeholder="Enter Name"><br>
-            <button type="button" id="join_global_button">Play</button>
-            <button id="join_private_button">Make Room</button>
+            <button type="button" id="play_button">Play</button>
+            <button id="create_private_button">Make Room</button>
         </section>
 
         <section id="lobby-section">
             Players
             <ul id="lobby-player-list" class="table"></ul>
             <p>Game Mode: Classic</p>
+            <p id="game-url"></p>
             <button id="start-lobby">Start Game</button>
         </section>
     </body>

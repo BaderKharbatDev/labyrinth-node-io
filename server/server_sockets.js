@@ -22,16 +22,37 @@ module.exports = function(io) {
             }
             manager.addUserToGame(gameKey, socket.id, player_name)
             socket.join(gameKey.toString())
+            io.to(socket.id).emit('game-starting', {})
         })
 
         //----------Handles when a user creates a private game
         socket.on('player-join-private-game', (data)=> {
             let player_name = data.name
-            let gameKey = manager.createGame() //creates game
+            let gameKey
+
+            if(data.gameurl) {
+                if(manager.games[data.gameurl]) {
+                    gameKey = data.gameurl//adds user to private game
+                } else {
+                    return //private game dne
+                }
+            } else {
+                gameKey = manager.createGame()
+            }
   
             manager.addUserToGame(gameKey, socket.id, player_name)
             socket.join(gameKey.toString()) //adds user to game
-            io.to(socket.id).emit('update-lobby', {players: manager.games[gameKey].players})
+
+            if(manager.games[gameKey].gameState == Game.gameStates.LOBBY) {
+                io.to(socket.id).emit('joined-lobby', {})
+                io.to(gameKey.toString()).emit('update-lobby', {
+                    players: manager.games[gameKey].players,
+                    gameurl: gameKey
+                })
+            } else {
+                io.to(socket.id).emit('game-starting', {})
+            }
+
         })
 
         //----------Handles the lobby leader starting the game
@@ -40,7 +61,7 @@ module.exports = function(io) {
             let gameKey = player.gameKey
             if(gameKey != null) {
                 manager.startGame(gameKey)
-                io.to(gameKey.toString()).emit('lobby-game-starting', {})
+                io.to(gameKey.toString()).emit('game-starting', {})
             }
         })
 

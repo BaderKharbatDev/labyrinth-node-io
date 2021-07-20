@@ -27,9 +27,14 @@ socket.on('update-lobby', function(data){
         ul.appendChild(li);
         li.innerHTML += player.name;   
     }
+    document.getElementById('game-url').innerHTML = "Share The Link With Friends: localhost:3000/?g="+data.gameurl.toString()
 })
 
-socket.on('lobby-game-starting', function(data) {
+socket.on('joined-lobby', function(data) {
+    toggleLobbySection()
+})
+
+socket.on('game-starting', function(data) {
     toggleCanvasSection()
 })
 
@@ -53,17 +58,27 @@ function toggleLobbySection() {
 } 
 
 //on click of the "PLAY" button
-function joinGlobalGame() {
+function play() {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    let g = params.g
     let name = document.getElementById("player_name").value;
+
     if(name && name.length >=1) {
-        socket.emit('player-join-global-game', {
-            name: name
-        })
-        toggleCanvasSection()
+        if(g) {
+            socket.emit('player-join-private-game', {
+                name: name,
+                gameurl: g
+            })
+        } else {
+            socket.emit('player-join-global-game', {
+                name: name
+            })
+        }
     }
 }
 
-function joinPrivateGame() {
+function playPrivate() {
     let name = document.getElementById("player_name").value;
     if(name && name.length >=1) {
         socket.emit('player-join-private-game', {
@@ -74,10 +89,10 @@ function joinPrivateGame() {
 }
 
 function startPrivateGame() {
-    socket.emit('game-start')
+    socket.emit('game-start', {})
 }
 
-document.getElementById("join_global_button").onclick = joinGlobalGame;
-document.getElementById("join_private_button").onclick = joinPrivateGame;
+document.getElementById("play_button").onclick = play;
+document.getElementById("create_private_button").onclick = playPrivate;
 document.getElementById("start-lobby").onclick = startPrivateGame;
 
