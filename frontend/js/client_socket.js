@@ -1,5 +1,5 @@
 import Canvas from '/static/js/canvas.js'
-import {colors, units} from '/static/js/constants.js'
+import {colors, server_socket, client_socket} from '/static/js/constants.js'
 
 const socket = io.connect();
 let client_canvas = null

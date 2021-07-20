@@ -9,6 +9,10 @@ module.exports = function(app, express){
         res.sendFile('frontend/templates/game_page.html' , { root : './'});
     });
 
+    // app.get('/server-constants', (req, res) => {
+    //     res.sendFile('server/socket_constants.js' , { root : './'});
+    // })
+
     // app.get('/:gamekey', (req, res) => {
     //     console.log(req.params.gamekey)
     //     res.sendFile('frontend/templates/game_page.html' , { root : './'});

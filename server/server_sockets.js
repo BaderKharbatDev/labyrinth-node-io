@@ -1,15 +1,17 @@
 const Game = require('../game_logic/game.js')
+const {server_constants, client_constants} = require('./socket_constants')
+
 
 module.exports = function(io) {
     const manager = new Manager()
 
-    io.on('connection', (socket) => {
+    io.on(server_constants.CONNECTION, (socket) => {
 
         //connects and adds a user to game
         manager.connectUser(socket)
 
         //----------Handles when a user joins a global game
-        socket.on('player-join-global-game', (data)=> {
+        socket.on(server_constants.JOIN_PUBLIC, (data)=> {
             let player_name = data.name
 
             let gameKey
@@ -22,11 +24,11 @@ module.exports = function(io) {
             }
             manager.addUserToGame(gameKey, socket.id, player_name)
             socket.join(gameKey.toString())
-            io.to(socket.id).emit('game-starting', {})
+            io.to(socket.id).emit(client_constants.SHOW_GAME, {})
         })
 
         //----------Handles when a user creates a private game
-        socket.on('player-join-private-game', (data)=> {
+        socket.on(server_constants.JOIN_PRIVATE, (data)=> {
             let player_name = data.name
             let gameKey
 
@@ -44,29 +46,29 @@ module.exports = function(io) {
             socket.join(gameKey.toString()) //adds user to game
 
             if(manager.games[gameKey].gameState == Game.gameStates.LOBBY) {
-                io.to(socket.id).emit('joined-lobby', {})
-                io.to(gameKey.toString()).emit('update-lobby', {
+                io.to(socket.id).emit(client_constants.UPDATE_LOBBY, {})
+                io.to(gameKey.toString()).emit(client_constants.UPDATE_LOBBY, {
                     players: manager.games[gameKey].players,
                     gameurl: gameKey
                 })
             } else {
-                io.to(socket.id).emit('game-starting', {})
+                io.to(socket.id).emit(client_constants.SHOW_GAME, {})
             }
 
         })
 
         //----------Handles the lobby leader starting the game
-        socket.on('game-start', (data)=>{
+        socket.on(server_constants.START_PRIVATE, (data)=>{
             let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
                 manager.startGame(gameKey)
-                io.to(gameKey.toString()).emit('game-starting', {})
+                io.to(gameKey.toString()).emit(client_constants.SHOW_GAME, {})
             }
         })
 
         //----------Handles User Input during a game
-        socket.on('user-input-data', (data)=>{
+        socket.on(server_constants.USER_GAME_INPUT, (data)=>{
             let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
@@ -75,7 +77,7 @@ module.exports = function(io) {
         })
 
 
-        socket.on('disconnect', ()=>{
+        socket.on(server_constants.DISCONNECT, ()=>{
             manager.disconnectUser(socket.id)
         })
     });

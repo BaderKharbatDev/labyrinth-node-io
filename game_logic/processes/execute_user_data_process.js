@@ -5,6 +5,8 @@ io.adapter(redis({ host: 'localhost', port: 6379 }));
 
 const Game = require('../game.js')
 const { Player } = require('../entity.js')
+const {client_constants} = require('../..server/socket_constants')
+
 
 const process_helper = {
     loop_going: true,
@@ -57,7 +59,7 @@ async function Loop() {
     let tickRate = second/40
     while(process_helper.loop_going) {
         // if(Object.keys(process_helper.players).length != 0) {
-            io.to(process_helper.gameKey.toString()).emit('update-board-state', {
+            io.to(process_helper.gameKey.toString()).emit(client_constants.UPDATE_BOARD, {
                 players: process_helper.players,
                 walls: process_helper.map
             })
