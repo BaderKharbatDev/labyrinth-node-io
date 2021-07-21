@@ -3,7 +3,8 @@ const colors = {
     white: '#ffffff',
     red: '#FF0000',
     blue: '#33ACFF',
-    yellow: '#8DFF33'
+    yellow: '#8DFF33',
+    pink: '#FFC0CB'
 }
 
 const keys = {

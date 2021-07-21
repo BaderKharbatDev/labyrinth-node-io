@@ -28,8 +28,14 @@ export default class board {
         this.ctx.fillStyle = color
         for(let row = 0; row < grid.length; row++) {
             for(let col = 0; col < grid[row].length; col++) {
-                if(grid[row][col] == true) {
+                if(grid[row][col].collidable == true) {
                     this.ctx.fillRect(col*this.block_size-1, row*this.block_size-1, this.block_size+1, this.block_size+1)
+                } else {
+                    this.ctx.fillStyle = colors.yellow
+                    if(grid[row][col].isEnd == true) {
+                        this.ctx.fillRect(col*this.block_size, row*this.block_size, this.block_size, this.block_size)
+                    }
+                    this.ctx.fillStyle = color
                 }
             }
         }
@@ -40,7 +46,7 @@ export default class board {
             if(key == socketID) {
                 this.ctx.fillStyle = colors.blue
             } else {
-                this.ctx.fillStyle = colors.yellow
+                this.ctx.fillStyle = colors.black
             }
             let p = players[key]
             this.ctx.fillRect(p.col*this.block_size-1, p.row*this.block_size-1, this.block_size/2+1, this.block_size/2+1)

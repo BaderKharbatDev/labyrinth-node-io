@@ -122,7 +122,7 @@ function isPositionCollidingWithMap(row, col) {
     for(var r = rounded_row-1; r <= rounded_row+1; r++) {
         for(var c = rounded_col-1; c <= rounded_col+1; c++) {
             try {
-                if(process_helper.map[r][c] == true) {
+                if(process_helper.map[r][c].collidable == true) {
                     if(Intersect({
                         x: col,
                         y: row,
