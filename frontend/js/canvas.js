@@ -7,8 +7,8 @@ export default class canvas {
 
     constructor(board_length) {
         let canvas_id = 'canvas'
-        var w = window.innerWidth;
-        var h = window.innerHeight;
+        var w = window.innerWidth*0.75;
+        var h = window.innerHeight*0.75;
         let canvas_pixle_size
         if(w > h) {
             canvas_pixle_size = h

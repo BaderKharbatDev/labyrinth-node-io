@@ -1,41 +1,40 @@
 const Game = require('../game_logic/game.js')
+const {server_constants, client_constants} = require('./socket_constants')
+
 
 module.exports = function(io) {
     const manager = new Manager()
 
-    io.on('connection', (socket) => {
+    io.on(server_constants.CONNECTION, (socket) => {
 
         //connects and adds a user to game
         manager.connectUser(socket)
-        let gameKey
-        if(Object.keys(manager.games).length == 0) { //no game in progress
-            gameKey = manager.createGame()
-            manager.startGame(gameKey, io)
-            manager.addUserToGame(gameKey, socket.id) //adds to existing game
-        } else {
-            let keyArray = Object.keys(manager.games)
-            gameKey = manager.games[keyArray[0]].id
-            manager.addUserToGame(gameKey, socket.id)
-        }
-        socket.emit('init-board-state', {walls: manager.games[gameKey].walls})
-1
 
-        //----------Handles User Entry Data i.e. before joining a lobby
-        socket.on('user-info-data', (data)=>{
-            
+        //----------Handles when a user joins a global game
+        socket.on(server_constants.JOIN_PUBLIC, (data)=> {
+            let player_name = data.name
+            connectUserToPublicGame(socket, player_name)            
+        })
+
+        //----------Handles when a user creates a private game
+        socket.on(server_constants.JOIN_PRIVATE, (data)=> {
+            let player_name = data.name
+            let url = data.gameurl
+            connectUsertoPrivateGame(socket, url, player_name)
         })
 
         //----------Handles the lobby leader starting the game
-        socket.on('game-start', (data)=>{
+        socket.on(server_constants.START_PRIVATE, (data)=>{
             let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
-                socket.emit('init-board-state', {walls: manager.games[gameKey].walls})
+                manager.startGame(gameKey)
+                io.to(gameKey.toString()).emit(client_constants.SHOW_GAME, {})
             }
         })
 
         //----------Handles User Input during a game
-        socket.on('user-input-data', (data)=>{
+        socket.on(server_constants.USER_GAME_INPUT, (data)=>{
             let player = manager.connections[socket.id]
             let gameKey = player.gameKey
             if(gameKey != null) {
@@ -44,13 +43,62 @@ module.exports = function(io) {
         })
 
 
-        socket.on('disconnect', ()=>{
+        socket.on(server_constants.DISCONNECT, ()=>{
             manager.disconnectUser(socket.id)
         })
+
+
+        //-----------------------helper functions
+        function connectUsertoPrivateGame(socket, url, player_name) {
+            let gameKey
+            if(url) {
+                if(manager.games[url]) {
+                    gameKey = url//adds user to private game
+                } else {
+                    connectUserToPublicGame(socket, player_name)// add user to public game
+                    return
+                }
+            } else {
+                gameKey = manager.createGame()
+            }
+  
+            manager.addUserToGame(gameKey, socket.id, player_name)
+            socket.join(gameKey.toString()) //adds user to game
+
+            if(manager.games[gameKey].gameState == Game.gameStates.LOBBY) {
+                let is_leader = (Object.keys(manager.games[gameKey].players).length == 1)
+                io.to(socket.id).emit(client_constants.SHOW_LOBBY, {
+                    is_leader: is_leader
+                })
+                io.to(gameKey.toString()).emit(client_constants.UPDATE_LOBBY, {
+                    players: manager.games[gameKey].players,
+                    gameurl: gameKey
+                })
+            } else {
+                io.to(socket.id).emit(client_constants.SHOW_GAME, {})
+            }
+        }
+
+        
+        function connectUserToPublicGame(socket, player_name) {
+            let gameKey
+            if(Object.keys(manager.games).length == 0) { //no game in progress
+                gameKey = manager.createGame()
+                manager.startGame(gameKey)
+            } else {
+                let keyArray = Object.keys(manager.games)
+                gameKey = manager.games[keyArray[0]].id
+            }
+            manager.addUserToGame(gameKey, socket.id, player_name)
+            socket.join(gameKey.toString())
+            io.to(socket.id).emit(client_constants.SHOW_GAME, {})
+        }
     });
 }
 
 class Manager {
+    static game_id_counter = 1
+
     constructor() {
         this.connections = {}
         this.games = {}
@@ -74,7 +122,9 @@ class Manager {
     }
 
     createGame() {
-        let temp_id = 1
+        let temp_id = Manager.game_id_counter
+        Manager.game_id_counter++
+
         let game = new Game(temp_id)
         this.games[game.id] = game
         return game.id
@@ -85,9 +135,9 @@ class Manager {
         game.startGame()
     }
 
-    addUserToGame(gameKey, socketID) {
+    addUserToGame(gameKey, socketID, player_name) {
         this.connections[socketID].gameKey = gameKey
-        this.games[gameKey].addPlayer(socketID)
+        this.games[gameKey].addPlayer(socketID, player_name)
     }
 
     removeUserFromGame(gameKey, socketID) {

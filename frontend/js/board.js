@@ -4,7 +4,10 @@ export default class board {
     constructor(ctx, board_pixle_size, board_length) {
         this.board_length = board_length
         this.block_size = board_pixle_size/board_length
-        this.ctx = ctx    
+        this.ctx = ctx
+
+        this.ctx.textBaseline = 'middle';
+        this.ctx.textAlign = "center";
     }
 
     colorBG(color) {
@@ -41,6 +44,11 @@ export default class board {
             }
             let p = players[key]
             this.ctx.fillRect(p.col*this.block_size-1, p.row*this.block_size-1, this.block_size/2+1, this.block_size/2+1)
+
+            //prints player name
+            this.ctx.font = "15px Arial";
+            let textlength = Math.floor(p.name.length/2)
+            this.ctx.fillText(p.name, (p.col)*this.block_size+5, (p.row-0.5)*this.block_size);
         }
     }
     

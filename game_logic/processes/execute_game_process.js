@@ -11,6 +11,20 @@ process.on('message', async (data) => {
     switch(data.cmd) {
         case Game.game_process_child_commands.START_GAME:
             process_helper.map = data.map
+            process_helper.gameKey = data.gameKey
+            if(data.players) {
+                let keys =  Object.keys(data.players)
+                for(var i = 0; i < keys.length; i++) {
+                    let player = data.players[keys[i]]
+                    process_helper.players[player.id] = {
+                        name:player.name,
+                        row:player.row,
+                        col:player.col,
+                        playerState:player.playerState,
+                        keyinputs: player.keyinputs
+                    }
+                }
+            }
             Loop()
             break;
         case Game.game_process_child_commands.USER_INPUT:
@@ -66,7 +80,7 @@ async function updateUserPosition(socketID, KeyInputs, tick_rate) {
     const previous_row_pos = process_helper.players[socketID].row
     const previous_col_pos = process_helper.players[socketID].col
     
-    let dps = 20
+    let dps = 10//20
     let dist = dps*2 * (tick_rate/1000)
 
     let new_col, new_row
@@ -103,23 +117,28 @@ async function updateUserPosition(socketID, KeyInputs, tick_rate) {
 
 function isPositionCollidingWithMap(row, col) {
     let player_size = 0.5, block_size = 1
+    let rounded_row = Math.floor(row), rounded_col = Math.floor(col)
     
-    for(var r = 0; r < process_helper.map.length; r++) {
-        for(var c = 0; c < process_helper.map.length; c++) {
-            if(process_helper.map[r][c] == true) {
-                if(Intersect({
-                    x: col,
-                    y: row,
-                    height: player_size,
-                    width: player_size
-                },{
-                    x: c,
-                    y: r,
-                    height: block_size,
-                    width: block_size
-                })) {
-                    return true
+    for(var r = rounded_row-1; r <= rounded_row+1; r++) {
+        for(var c = rounded_col-1; c <= rounded_col+1; c++) {
+            try {
+                if(process_helper.map[r][c] == true) {
+                    if(Intersect({
+                        x: col,
+                        y: row,
+                        height: player_size,
+                        width: player_size
+                    },{
+                        x: c,
+                        y: r,
+                        height: block_size,
+                        width: block_size
+                    })) {
+                        return true
+                    }
                 }
+            } catch(err) {
+                continue
             }
         }
     }
