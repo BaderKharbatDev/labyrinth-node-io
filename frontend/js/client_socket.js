@@ -34,7 +34,7 @@ socket.on(client_socket.SHOW_LOBBY, function(data) {
     toggleLobbySection()
 })
 
-socket.on(client_socket.SHOW_LOBBY, function(data) {
+socket.on(client_socket.SHOW_GAME, function(data) {
     toggleCanvasSection()
 })
 
@@ -66,12 +66,12 @@ function play() {
 
     if(name && name.length >=1) {
         if(g) {
-            socket.emit('player-join-private-game', {
+            socket.emit(server_socket.JOIN_PRIVATE, {
                 name: name,
                 gameurl: g
             })
         } else {
-            socket.emit('player-join-global-game', {
+            socket.emit(server_socket.JOIN_PUBLIC, {
                 name: name
             })
         }
