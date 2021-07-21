@@ -46,7 +46,7 @@ module.exports = function(io) {
             socket.join(gameKey.toString()) //adds user to game
 
             if(manager.games[gameKey].gameState == Game.gameStates.LOBBY) {
-                io.to(socket.id).emit(client_constants.UPDATE_LOBBY, {})
+                io.to(socket.id).emit(client_constants.SHOW_LOBBY, {})
                 io.to(gameKey.toString()).emit(client_constants.UPDATE_LOBBY, {
                     players: manager.games[gameKey].players,
                     gameurl: gameKey

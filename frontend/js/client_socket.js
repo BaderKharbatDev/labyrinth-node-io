@@ -8,17 +8,17 @@ socket.on('connect', function(data) {
     console.log('Connected')
 });
 
-socket.on('update-board-state', function(data) {
+socket.on(client_socket.UPDATE_BOARD, function(data) {
     if(!client_canvas) {
         client_canvas = new Canvas(data.walls.length) 
     }
     client_canvas.board.colorBG(colors.white) //bg
     client_canvas.board.paintObstacles(colors.red, data.walls) //walls
     client_canvas.board.paintPlayers(socket.id, data.players)
-    socket.emit('user-input-data', {keyinputs: client_canvas.keyinputs})
+    socket.emit(server_socket.USER_GAME_INPUT, {keyinputs: client_canvas.keyinputs})
 })
 
-socket.on('update-lobby', function(data){
+socket.on(client_socket.UPDATE_LOBBY, function(data){
     let ul = document.getElementById("lobby-player-list")
     ul.innerHTML = "";
     for (var key in data.players){
@@ -30,11 +30,11 @@ socket.on('update-lobby', function(data){
     document.getElementById('game-url').innerHTML = "Share The Link With Friends: localhost:3000/?g="+data.gameurl.toString()
 })
 
-socket.on('joined-lobby', function(data) {
+socket.on(client_socket.SHOW_LOBBY, function(data) {
     toggleLobbySection()
 })
 
-socket.on('game-starting', function(data) {
+socket.on(client_socket.SHOW_LOBBY, function(data) {
     toggleCanvasSection()
 })
 

@@ -28,7 +28,8 @@ const server_socket_constants = {
 
 const client_socket_constants = {
     SHOW_GAME: 'game-starting',
-    UPDATE_LOBBY: 'joined-lobby',
+    SHOW_LOBBY: 'show-lobby',
+    UPDATE_LOBBY: 'update-lobby',
     UPDATE_BOARD: 'update-board-state'
 }
 
