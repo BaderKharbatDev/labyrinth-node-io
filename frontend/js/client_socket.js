@@ -27,10 +27,13 @@ socket.on(client_socket.UPDATE_LOBBY, function(data){
         ul.appendChild(li);
         li.innerHTML += player.name;   
     }
-    document.getElementById('game-url').innerHTML = "Share The Link With Friends: localhost:3000/?g="+data.gameurl.toString()
+    document.getElementById('game-url').innerHTML = "localhost:3000/?g="+data.gameurl.toString()
 })
 
 socket.on(client_socket.SHOW_LOBBY, function(data) {
+    if(data.is_leader == false) {
+        document.getElementById("start-lobby").style.display = "none";
+    }
     toggleLobbySection()
 })
 

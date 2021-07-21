@@ -66,7 +66,10 @@ module.exports = function(io) {
             socket.join(gameKey.toString()) //adds user to game
 
             if(manager.games[gameKey].gameState == Game.gameStates.LOBBY) {
-                io.to(socket.id).emit(client_constants.SHOW_LOBBY, {})
+                let is_leader = (Object.keys(manager.games[gameKey].players).length == 1)
+                io.to(socket.id).emit(client_constants.SHOW_LOBBY, {
+                    is_leader: is_leader
+                })
                 io.to(gameKey.toString()).emit(client_constants.UPDATE_LOBBY, {
                     players: manager.games[gameKey].players,
                     gameurl: gameKey
