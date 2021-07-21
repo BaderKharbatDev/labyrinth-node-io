@@ -46,9 +46,9 @@ export default class board {
             this.ctx.fillRect(p.col*this.block_size-1, p.row*this.block_size-1, this.block_size/2+1, this.block_size/2+1)
 
             //prints player name
-            this.ctx.font = "20px Arial";
+            this.ctx.font = "15px Arial";
             let textlength = Math.floor(p.name.length/2)
-            this.ctx.fillText(p.name, (p.col)*this.block_size+10, (p.row-0.5)*this.block_size);
+            this.ctx.fillText(p.name, (p.col)*this.block_size+5, (p.row-0.5)*this.block_size);
         }
     }
     

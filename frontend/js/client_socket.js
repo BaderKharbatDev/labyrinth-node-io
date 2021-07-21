@@ -1,5 +1,5 @@
 import Canvas from '/static/js/canvas.js'
-import {colors, units} from '/static/js/constants.js'
+import {colors, server_socket, client_socket} from '/static/js/constants.js'
 
 const socket = io.connect();
 let client_canvas = null
@@ -8,17 +8,17 @@ socket.on('connect', function(data) {
     console.log('Connected')
 });
 
-socket.on('update-board-state', function(data) {
+socket.on(client_socket.UPDATE_BOARD, function(data) {
     if(!client_canvas) {
         client_canvas = new Canvas(data.walls.length) 
     }
     client_canvas.board.colorBG(colors.white) //bg
     client_canvas.board.paintObstacles(colors.red, data.walls) //walls
     client_canvas.board.paintPlayers(socket.id, data.players)
-    socket.emit('user-input-data', {keyinputs: client_canvas.keyinputs})
+    socket.emit(server_socket.USER_GAME_INPUT, {keyinputs: client_canvas.keyinputs})
 })
 
-socket.on('update-lobby', function(data){
+socket.on(client_socket.UPDATE_LOBBY, function(data){
     let ul = document.getElementById("lobby-player-list")
     ul.innerHTML = "";
     for (var key in data.players){
@@ -27,14 +27,17 @@ socket.on('update-lobby', function(data){
         ul.appendChild(li);
         li.innerHTML += player.name;   
     }
-    document.getElementById('game-url').innerHTML = "Share The Link With Friends: localhost:3000/?g="+data.gameurl.toString()
+    document.getElementById('game-url').innerHTML = "localhost:3000/?g="+data.gameurl.toString()
 })
 
-socket.on('joined-lobby', function(data) {
+socket.on(client_socket.SHOW_LOBBY, function(data) {
+    if(data.is_leader == false) {
+        document.getElementById("start-lobby").style.display = "none";
+    }
     toggleLobbySection()
 })
 
-socket.on('game-starting', function(data) {
+socket.on(client_socket.SHOW_GAME, function(data) {
     toggleCanvasSection()
 })
 
@@ -66,12 +69,12 @@ function play() {
 
     if(name && name.length >=1) {
         if(g) {
-            socket.emit('player-join-private-game', {
+            socket.emit(server_socket.JOIN_PRIVATE, {
                 name: name,
                 gameurl: g
             })
         } else {
-            socket.emit('player-join-global-game', {
+            socket.emit(server_socket.JOIN_PUBLIC, {
                 name: name
             })
         }
