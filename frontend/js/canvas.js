@@ -22,7 +22,6 @@ export default class canvas {
         this.game_canvas.width = this.game_canvas.height = canvas_pixle_size 
     
         this.board = new Board(this.ctx, canvas_pixle_size, board_length)
-        this.board.colorBG(colors.white)
         this.keyinputs = new KeyInputs()
         document.addEventListener('keydown', this.keydown);
         document.addEventListener('keyup', this.keyup);

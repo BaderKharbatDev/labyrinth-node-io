@@ -102,11 +102,13 @@ module.exports = class Game {
         USER_INPUT: 1,
         USER_ADDED: 2,
         USER_REMOVED:3,
-        USER_POSITION: 4
+        USER_POSITION: 4,
+        RESET_MAP: 5
     }
 
     static game_process_parent_commands = {
-        UPDATED_USER_POSITION: 0
+        UPDATED_USER_POSITION: 0,
+        RESET_BOARD_STATE: 1
     }
 
     startGame() {
@@ -125,6 +127,17 @@ module.exports = class Game {
             switch(data.cmd) {
                 case Game.game_process_parent_commands.UPDATED_USER_POSITION:
                     this.handleUserPositionData(data.id, data.row, data.col, data.playerState)
+                    break;
+                case Game.game_process_parent_commands.RESET_BOARD_STATE:
+                    this.walls = this.makeMaze(this.grid_size)
+                    this.parent_game_process.send({
+                        cmd: Game.game_process_child_commands.RESET_MAP,
+                        map: this.walls
+                    })
+                    this.parent_data_process.send({
+                        cmd: Game.game_process_child_commands.RESET_MAP,
+                        map: this.walls
+                    })
                     break;
             }
         });

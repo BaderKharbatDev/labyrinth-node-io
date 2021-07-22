@@ -50,6 +50,15 @@ process.on('message', async (data) => {
         case Game.game_process_child_commands.USER_REMOVED:
             delete process_helper.players[data.id]
             break;
+            case Game.game_process_child_commands.RESET_MAP:
+                if(data.map) {
+                    process_helper.map = data.map
+                    process_helper.loop_going = false
+                    await sleep(100)
+                    process_helper.loop_going = true
+                }
+                Loop()
+                break;
     }
 });
 
@@ -57,12 +66,10 @@ async function Loop() {
     let second = 1000
     let tickRate = second/40
     while(process_helper.loop_going) {
-        // if(Object.keys(process_helper.players).length != 0) {
-            io.to(process_helper.gameKey.toString()).emit('update-board-state', {
-                players: process_helper.players,
-                walls: process_helper.map
-            })
-        // }
+        io.to(process_helper.gameKey.toString()).emit('update-board-state', {
+            players: process_helper.players,
+            walls: process_helper.map
+        })
         await sleep(tickRate)
     }
 }
