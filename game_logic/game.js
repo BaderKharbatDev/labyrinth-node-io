@@ -129,7 +129,9 @@ module.exports = class Game {
                     this.handleUserPositionData(data.id, data.row, data.col, data.playerState)
                     break;
                 case Game.game_process_parent_commands.RESET_BOARD_STATE:
+                    this.grid_size += 2
                     this.walls = this.makeMaze(this.grid_size)
+
                     this.parent_game_process.send({
                         cmd: Game.game_process_child_commands.RESET_MAP,
                         map: this.walls

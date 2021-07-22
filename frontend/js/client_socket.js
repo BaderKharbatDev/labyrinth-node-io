@@ -9,7 +9,7 @@ socket.on('connect', function(data) {
 });
 
 socket.on(client_socket.INIT_BOARD, function(data) {
-    client_canvas = new Canvas(data.walls.length) 
+    client_canvas = new Canvas(data.map.length) 
 })
 
 socket.on(client_socket.UPDATE_BOARD, function(data) {
