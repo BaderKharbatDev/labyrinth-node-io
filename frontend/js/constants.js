@@ -31,7 +31,8 @@ const client_socket_constants = {
     SHOW_GAME: 'game-starting',
     SHOW_LOBBY: 'show-lobby',
     UPDATE_LOBBY: 'update-lobby',
-    UPDATE_BOARD: 'update-board-state'
+    UPDATE_BOARD: 'update-board-state',
+    INIT_BOARD: 'init-board-state'
 }
 
 export { colors as colors, keys as keys, client_socket_constants as client_socket, server_socket_constants as server_socket}

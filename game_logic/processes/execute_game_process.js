@@ -4,7 +4,8 @@ const { Player } = require('../entity.js')
 const process_helper = {
     loop_going: true,
     players: {},
-    map: {}
+    map: {},
+    end_tiles: []
 }
 
 process.on('message', async (data) => {
@@ -22,6 +23,16 @@ process.on('message', async (data) => {
                         col:player.col,
                         playerState:player.playerState,
                         keyinputs: player.keyinputs
+                    }
+                }
+            }
+            if(data.map) {
+                for(var r = 0; r < process_helper.map.length; r++) {
+                    for(var c = 0; c < process_helper.map.length; c++) {
+                        let tile = process_helper.map[r][c]
+                        if(tile.isEnd == true) {
+                            process_helper.end_tiles.push(tile)
+                        }
                     }
                 }
             }
@@ -43,6 +54,20 @@ process.on('message', async (data) => {
         case Game.game_process_child_commands.USER_REMOVED:
             delete process_helper.players[data.id]
             break;
+        case Game.game_process_child_commands.RESET_MAP:
+            if(data.map) {
+                process_helper.map = data.map
+                for(var r = 0; r < process_helper.map.length; r++) {
+                    for(var c = 0; c < process_helper.map.length; c++) {
+                        let tile = process_helper.map[r][c]
+                        if(tile.isEnd == true) {
+                            process_helper.end_tiles.push(tile)
+                        }
+                    }
+                }
+            }
+            Loop()
+            break;
     }
 });
 
@@ -50,17 +75,79 @@ async function Loop() {
     let second = 1000
     let tickRate = second/200
     while(process_helper.loop_going) {
-        if(Object.keys(process_helper.players).length != 0) {
-            for (var id in process_helper.players) {
-                updateUserPosition(id, process_helper.players[id].keyinputs, tickRate)
-                sendParentUpdatedUserPosition(id)
-            }
+
+        //process player movements
+        processPlayersMovement(tickRate)
+
+        //check for win condition
+        let check = checkForWinCondition()
+        // console.log(check)
+        if(check.condition_met==true) {
+            resetBoardState()
+            break
         }
+
         await sleep(tickRate)
     }
 }
 
-async function sendParentUpdatedUserPosition(id) {
+async function resetBoardState() {                                  //NOTIFYS ALL PLAYERS OF INDIVIDUAL UPDATED PLAYER POSITION
+    process_helper.end_tiles = []
+
+    //resets player positions
+    let reset_row = 1, reset_col = 1
+    for (const [key, player] of Object.entries(process_helper.players)) {
+        player.row = reset_row,
+        player.col = reset_col
+    }
+
+    process.send({
+        cmd: Game.game_process_parent_commands.RESET_BOARD_STATE
+    });
+}
+
+function checkForWinCondition() {                                           //CHECK FOR WIN CONDITION
+    let win_condition = false
+    let winning_players = []
+
+    let player_size = 0.5, block_size = 1
+    for (const [key, player] of Object.entries(process_helper.players)) {
+        for (var i = 0; i < process_helper.end_tiles.length; i++) {
+            let tile = process_helper.end_tiles[i]
+            if(Intersect({
+                x: player.col,
+                y: player.row,
+                height: player_size,
+                width: player_size
+            },{
+                x: tile.col,
+                y: tile.row,
+                height: block_size,
+                width: block_size
+            })) {
+                win_condition = true
+                winning_players.push(key)
+                break;
+            }
+        } 
+    }
+
+    return {
+        condition_met: win_condition,
+        condition_players: winning_players
+    }
+}
+
+async function processPlayersMovement(tickRate) {                                            //PROCESSES PLAYER MOEVEMENT
+    if(Object.keys(process_helper.players).length != 0) {  
+        for (var id in process_helper.players) {
+            updateUserPosition(id, process_helper.players[id].keyinputs, tickRate)
+            sendParentUpdatedUserPosition(id)
+        }
+    }
+}
+
+async function sendParentUpdatedUserPosition(id) {                                  //NOTIFYS ALL PLAYERS OF INDIVIDUAL UPDATED PLAYER POSITION
     process.send({
         cmd: Game.game_process_parent_commands.UPDATED_USER_POSITION,
         id: id,

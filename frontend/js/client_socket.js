@@ -8,6 +8,10 @@ socket.on('connect', function(data) {
     console.log('Connected')
 });
 
+socket.on(client_socket.INIT_BOARD, function(data) {
+    client_canvas = new Canvas(data.walls.length) 
+})
+
 socket.on(client_socket.UPDATE_BOARD, function(data) {
     if(!client_canvas) {
         client_canvas = new Canvas(data.walls.length) 
