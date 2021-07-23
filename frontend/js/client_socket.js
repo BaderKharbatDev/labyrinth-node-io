@@ -31,7 +31,9 @@ socket.on(client_socket.UPDATE_LOBBY, function(data){
         ul.appendChild(li);
         li.innerHTML += player.name;   
     }
-    document.getElementById('game-url').innerHTML = "localhost:3000/?g="+data.gameurl.toString()
+    var getUrl = window.location;
+    var baseUrl = getUrl .protocol + "//" + getUrl.host   
+    document.getElementById('game-url').innerHTML = baseUrl+"/?g="+data.gameurl.toString()
 })
 
 socket.on(client_socket.SHOW_LOBBY, function(data) {
