@@ -5,7 +5,7 @@ export default class canvas {
 
     static c = {}
 
-    constructor(board_length) {
+    constructor(board_length, map) {
         let canvas_id = 'canvas'
         var w = window.innerWidth*0.75;
         var h = window.innerHeight*0.75;
@@ -21,7 +21,7 @@ export default class canvas {
         this.ctx = this.game_canvas.getContext('2d')
         this.game_canvas.width = this.game_canvas.height = canvas_pixle_size 
     
-        this.board = new Board(this.ctx, canvas_pixle_size, board_length)
+        this.board = new Board(this.ctx, canvas_pixle_size, board_length, map)
         this.keyinputs = new KeyInputs()
         document.addEventListener('keydown', this.keydown);
         document.addEventListener('keyup', this.keyup);

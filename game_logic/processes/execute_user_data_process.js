@@ -63,15 +63,16 @@ process.on('message', async (data) => {
 });
 
 async function Loop() {
-    io.to(process_helper.gameKey.toString()).emit('init-board-state', {
+    // while(!process_helper.map) continue
+    io.to(process_helper.gameKey.toString()).emit('init-board-state', { //imit init board state
         map: process_helper.map
-    }) //init board size
+    })
     let second = 1000
     let tickRate = second/40
     while(process_helper.loop_going) {
-        io.to(process_helper.gameKey.toString()).emit('update-board-state', { //emit board state to room
+        io.to(process_helper.gameKey.toString()).emit('update-board-state', { //emit player location/board status
             players: process_helper.players,
-            walls: process_helper.map
+            // walls: process_helper.map
         })
         await sleep(tickRate)
     }

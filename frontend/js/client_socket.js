@@ -9,15 +9,15 @@ socket.on('connect', function(data) {
 });
 
 socket.on(client_socket.INIT_BOARD, function(data) {
-    client_canvas = new Canvas(data.map.length) 
+    client_canvas = new Canvas(data.map.length, data.map) 
 })
 
 socket.on(client_socket.UPDATE_BOARD, function(data) {
-    if(!client_canvas) {
-        client_canvas = new Canvas(data.walls.length) 
-    }
+    // if(!client_canvas) {
+    //     client_canvas = new Canvas(data.walls.length) 
+    // }
     client_canvas.board.colorBG(colors.white) //bg
-    client_canvas.board.paintObstacles(colors.red, data.walls) //walls
+    client_canvas.board.paintObstacles(colors.red) //walls
     client_canvas.board.paintPlayers(socket.id, data.players)
     socket.emit(server_socket.USER_GAME_INPUT, {keyinputs: client_canvas.keyinputs})
 })

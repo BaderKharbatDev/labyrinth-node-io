@@ -1,11 +1,12 @@
 import {colors} from '/static/js/constants.js'
 
 export default class board {
-    constructor(ctx, board_pixle_size, board_length) {
+    constructor(ctx, board_pixle_size, board_length, map) {
         this.board_length = board_length
         this.block_size = board_pixle_size/board_length
-        this.ctx = ctx
+        this.map = map
 
+        this.ctx = ctx
         this.ctx.textBaseline = 'middle';
         this.ctx.textAlign = "center";
     }
@@ -24,7 +25,8 @@ export default class board {
         }
     }
 
-    paintObstacles(color, grid) {
+    paintObstacles(color) {
+        let grid = this.map
         this.ctx.fillStyle = color
         for(let row = 0; row < grid.length; row++) {
             for(let col = 0; col < grid[row].length; col++) {
