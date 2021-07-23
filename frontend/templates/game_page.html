@@ -8,8 +8,10 @@
         <script type="module" src="/static/js/client_socket.js"></script>
         <style>
             body {
-                margin: 0;
-                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
             }
 
             ul {
@@ -21,7 +23,6 @@
             p, button {
                 margin-top: 20px;
             }
-
         </style>
     </head>
     <body>
@@ -34,10 +35,19 @@
             </div>
         </section>
 
-        <section id="login-form-section" style="margin-top: 75px;">
-            <input type="text" id="player_name" placeholder="Enter Name"><br>
-            <button type="button" id="play_button">Play</button>
-            <button id="create_private_button">Make Room</button>
+        <section id="login-form-section" style="margin-top: 75px; width: 75vw; max-width: 500px;">
+            <input type="text" id="player_name" placeholder="Enter Name" style="width: 100%; text-align: center; padding-top:5px; padding-bottom: 5px;"><br>
+            <button type="button" id="play_button" style="margin-top: 25px; width: 100%; padding:5px;">Play</button>
+            <div style="display: flex; justify-content: center;text-align: center; margin-top: 20px; align-items: center;">
+                <p style="margin-right: 10px;">Gamemode (Private Games Only): </p>
+                <select style="height: 20px;" name="gamemodes" id="gamemodes">
+                    <option value="classic">Classic</option>
+                    <option value="blackout">Black Out</option>
+                    <option value="incrementing">Growing Map</option>
+                    <option value="musical chairs">Musical Chairs</option>
+                </select>
+            </div>
+            <button id="create_private_button" style="margin-top: 5px; width: 100%; padding:5px;">Make Room</button>
         </section>
 
         <section id="lobby-section">

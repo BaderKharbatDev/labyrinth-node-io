@@ -82,6 +82,8 @@ function play() {
                 name: name
             })
         }
+    } else {
+        alert('Name Field Cannot Be Empty :)')
     }
 }
 
@@ -92,6 +94,8 @@ function playPrivate() {
             name: name
         })
         toggleLobbySection()
+    } else {
+        alert('Name Field Cannot Be Empty :)')
     }
 }
 
