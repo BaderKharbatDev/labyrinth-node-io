@@ -105,7 +105,8 @@ class Manager {
     }
 
     connectUser(socket) {
-        console.log('A user connected: '+socket.id);
+        var clientIp = socket.request.connection.remoteAddress;
+        console.log('A user connected: '+clientIp);
         this.connections[socket.id] = socket
     }
     
