@@ -8,7 +8,7 @@ const { Player } = require('../entity.js')
 
 
 const process_helper = {
-    loop_going: true,
+    loop_going: false,
     players: {},
     map: {},
     gameKey: null
@@ -46,6 +46,11 @@ process.on('message', async (data) => {
                 col:data.col,
                 playerState:data.playerState
             }
+            if(process_helper.loop_going) {
+                io.to(data.id).emit('init-board-state', { //imit init board state
+                    map: process_helper.map
+                })
+            }
             break;
         case Game.game_process_child_commands.USER_REMOVED:
             delete process_helper.players[data.id]
@@ -63,10 +68,11 @@ process.on('message', async (data) => {
 });
 
 async function Loop() {
-    // while(!process_helper.map) continue
     io.to(process_helper.gameKey.toString()).emit('init-board-state', { //imit init board state
         map: process_helper.map
     })
+
+    process_helper.loop_going = true
     let second = 1000
     let tickRate = second/40
     while(process_helper.loop_going) {

@@ -39,6 +39,7 @@ socket.on(client_socket.UPDATE_LOBBY, function(data){
 socket.on(client_socket.SHOW_LOBBY, function(data) {
     if(data.is_leader == false) {
         document.getElementById("start-lobby").style.display = "none";
+        document.getElementById("gamemode-div").style.display = "none";
     }
     toggleLobbySection()
 })
