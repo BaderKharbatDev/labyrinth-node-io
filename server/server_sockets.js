@@ -44,7 +44,7 @@ module.exports = function(io) {
 
 
         socket.on(server_constants.DISCONNECT, ()=>{
-            manager.disconnectUser(socket.id)
+            manager.disconnectUser(socket)
         })
 
 
@@ -110,16 +110,17 @@ class Manager {
         this.connections[socket.id] = socket
     }
     
-    disconnectUser(socketID) {
-        console.log('A user disconnected: '+socketID)
-        let playerGameID = this.connections[socketID].gameKey
+    disconnectUser(socket) {
+        var clientIp = socket.request.connection.remoteAddress;
+        console.log('A user disconnected: '+clientIp);
+        let playerGameID = this.connections[socket.id].gameKey
         if(playerGameID != null) {
-            this.removeUserFromGame(playerGameID, socketID) //removes player from game
+            this.removeUserFromGame(playerGameID, socket.id) //removes player from game
             if(Object.keys(this.games[playerGameID].players).length == 0) {
                 delete this.games[playerGameID]              //deletes game if empty
             }
         }
-        delete this.connections[socketID]                           //deletes socket from connections
+        delete this.connections[socket.id]                           //deletes socket from connections
     }
 
     createGame() {
