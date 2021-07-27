@@ -74,7 +74,7 @@ async function Loop() {
 
     process_helper.loop_going = true
     let second = 1000
-    let tickRate = second/40
+    let tickRate = second/100
     while(process_helper.loop_going) {
         io.to(process_helper.gameKey.toString()).emit('update-board-state', { //emit player location/board status
             players: process_helper.players,
