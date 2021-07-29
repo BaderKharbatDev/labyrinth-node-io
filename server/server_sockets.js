@@ -42,11 +42,9 @@ module.exports = function(io) {
             }
         })
 
-
         socket.on(server_constants.DISCONNECT, ()=>{
             manager.disconnectUser(socket)
         })
-
 
         //-----------------------helper functions
         function connectUsertoPrivateGame(socket, url, player_name) {
@@ -79,7 +77,6 @@ module.exports = function(io) {
             }
         }
 
-        
         function connectUserToPublicGame(socket, player_name) {
             let gameKey
             if(Object.keys(manager.games).length == 0) { //no game in progress

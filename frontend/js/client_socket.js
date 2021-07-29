@@ -9,6 +9,7 @@ socket.on('connect', function(data) {
 });
 
 socket.on(client_socket.INIT_BOARD, function(data) {
+    // console.log('SENDING MAP')
     client_canvas = new Canvas(data.map.length, data.map) 
 })
 

@@ -28,11 +28,6 @@ module.exports = class Maze {
         for(let row = 0; row < this.grid.length; row++) {
             for(let col = 0; col < this.grid.length; col++) {
                 var cell = this.grid[row][col]
-                // if(cell.collidable == true) {
-                //     rv[row][col] = true
-                // } else {
-                //     rv[row][col] = false
-                // }
                 rv[row][col] = cell
             }
         }
