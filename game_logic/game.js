@@ -1,4 +1,3 @@
-const { fork } = require('child_process');
 const {Tile, Player, KeyInputs} = require('./entity.js')
 const Maze = require('./maze.js')
 
@@ -87,20 +86,6 @@ module.exports = class Game {
             this.players[socketID].col = col
             this.players[socketID].playerState = playerState
         }   
-    }
-   
-    static game_process_child_commands = {
-        START_GAME: 0,
-        USER_INPUT: 1,
-        USER_ADDED: 2,
-        USER_REMOVED:3,
-        USER_POSITION: 4,
-        RESET_MAP: 5
-    }
-
-    static game_process_parent_commands = {
-        UPDATED_USER_POSITION: 0,
-        RESET_BOARD_STATE: 1
     }
 
     startGame() {
