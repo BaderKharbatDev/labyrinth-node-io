@@ -44,7 +44,7 @@ module.exports = function(io) {
             } else if(cmd == socket_constants.JOIN_PRIVATE) {
                 let player_name = packet.name
                 let url = packet.gameurl
-                connectUsertoPrivateGame(socket, url, player_name)
+                io.connectUsertoPrivateGame(socket, url, player_name)
             } else if(cmd == socket_constants.START_PRIVATE) {
                 let player = manager.connections[socket.id]
                 let gameKey = player.gameKey
@@ -168,7 +168,7 @@ class Manager {
                 delete this.games[playerGameID]              //deletes game if empty
             }
         }
-        delete this.connections[socket.id]                           //deletes socket from connections
+        delete this.connections[socketID]                           //deletes socket from connections
     }
 
     createGame() {
