@@ -22,7 +22,7 @@ const client_constants = {
 }
 
 // Create WebSocket connection.
-const soc = new WebSocket('ws://localhost:8080');
+const soc = new WebSocket('ws://localhost:80');
 
 // Connection opened
 soc.addEventListener('open', function (event) {
