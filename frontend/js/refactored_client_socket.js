@@ -32,7 +32,7 @@ soc.addEventListener('open', function (event) {
 // Listen for messages
 soc.addEventListener('message', function (e) {
     let packet = JSON.parse(e.data);
-    console.log(packet.cmd)
+    // console.log(packet.cmd)
     switch(packet.cmd) {
         case client_constants.INIT_CLIENT:
             soc.id = packet.id
@@ -106,16 +106,17 @@ function play() {
     if(name && name.length >=1) {
         if(g) {
             let packet = {
-                cmd: client_constants.JOIN_PRIVATE,
+                cmd: server_constants.JOIN_PRIVATE,
                 name: name,
                 gameurl: g
             }
             soc.send(JSON.stringify(packet))
         } else {
             let packet = {
-                cmd: client_constants.JOIN_PUBLIC
+                cmd: server_constants.JOIN_PUBLIC
             }
             soc.send(JSON.stringify(packet))
+            // soc.send(JSON.stringify({msg:'test'}))
         }
     } else {
         alert('Name Field Cannot Be Empty :)')
@@ -126,7 +127,7 @@ function playPrivate() {
     let name = document.getElementById("player_name").value;
     if(name && name.length >=1) {
         let packet = {
-            cmd: client_constants.JOIN_PRIVATE,
+            cmd: server_constants.JOIN_PRIVATE,
             name: name
         }
         soc.send(JSON.stringify(packet))
@@ -138,7 +139,7 @@ function playPrivate() {
 
 function startPrivateGame() {
     let packet = {
-        cmd: client_constants.START_PRIVATE,
+        cmd: server_constants.START_PRIVATE,
     }
     soc.send(JSON.stringify(packet))
 }

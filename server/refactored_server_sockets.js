@@ -24,18 +24,20 @@ module.exports = function(io) {
 
     io.on(socket_constants.CONNECTION, function connection(socket) {
         socket.id = io.getUniqueID();
+        console.log('Client Connected id: '+socket.id)
+
         let packet = {
-            cmd: server_socket.INIT_CLIENT,
+            cmd: socket_constants.INIT_CLIENT,
             id: socket.id
         }
         socket.send(JSON.stringify(packet))
-        console.log('Client Connected id: '+socket.id)
 
         manager.connectUser(socket)
 
         socket.on(socket_constants.CLIENT_MESSAGE, function incoming(e) {
-            let packet = JSON.parse(e.data);
-            console.log(packet.cmd)
+            let packet = JSON.parse(e)
+            // console.log(packet.cmd)
+
             switch(packet.cmd) {
                 case socket_constants.JOIN_PUBLIC:
                     let player_name = packet.name
