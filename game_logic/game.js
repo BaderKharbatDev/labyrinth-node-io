@@ -1,10 +1,7 @@
 const {Tile, Player, KeyInputs} = require('./entity.js')
 const Maze = require('./maze.js')
 
-var server = require('http').createServer();
-var io = require('socket.io')(server);
-var redis = require('socket.io-redis');
-io.adapter(redis({ host: 'localhost', port: 6379 }));
+const io = new WebSocketServer({ noServer: true });
 
 module.exports = class Game {
     static gameStates = {
@@ -16,6 +13,7 @@ module.exports = class Game {
     constructor(id) {
         this.id = id
         this.players = {}
+        this.clients = {}
         this.gameState = Game.gameStates.LOBBY
 
         this.grid_size = 10
@@ -57,6 +55,7 @@ module.exports = class Game {
 
     removePlayer(socketID) {
         delete this.players[socketID]
+        delete this.clients[socketID]
         if(this.gameState == Game.gameStates.INGAME) { //IF IN GAME SEND PLAYER DATA
             if(this.players.length == 0) { ///KILLS GAME PROCESSES
                 this.endGame()
@@ -64,11 +63,12 @@ module.exports = class Game {
         }
     }
 
-    addPlayer(socketID, player_name) {
-        let player = new Player(socketID, player_name, null, 1, 1, 0.5)
-        this.players[socketID] = player
+    addPlayer(socket, player_name) {
+        let player = new Player(socket.id, player_name, null, 1, 1, 0.5)
+        this.players[socket.id] = player
+        this.clients[socket.id] = socket
         if(this.gameState == Game.gameStates.INGAME) {
-            io.to(socketID).emit('init-board-state', { //imit init board state
+            io.to(socket.id).emit('init-board-state', { //imit init board state
                 map: this.tiles
             })
         }
