@@ -1,7 +1,8 @@
 const {Tile, Player, KeyInputs} = require('./entity.js')
 const Maze = require('./maze.js')
 
-const io = new WebSocketServer({ noServer: true });
+// const ws = require('ws');
+// const io = new ws.Server({ noServer: true });
 
 module.exports = class Game {
     static gameStates = {
@@ -68,9 +69,9 @@ module.exports = class Game {
         this.players[socket.id] = player
         this.clients[socket.id] = socket
         if(this.gameState == Game.gameStates.INGAME) {
-            io.to(socket.id).emit('init-board-state', { //imit init board state
-                map: this.tiles
-            })
+            // io.to(socket.id).emit('init-board-state', { //imit init board state
+            //     map: this.tiles
+            // })
         }
     }
 
@@ -89,9 +90,9 @@ module.exports = class Game {
     }
 
     startGame() {
-        io.to(this.id.toString()).emit('init-board-state', { //imit init board state
-            map: this.tiles
-        })
+        // io.to(this.id.toString()).emit('init-board-state', { //imit init board state
+        //     map: this.tiles
+        // })
         this.gameState = Game.gameStates.INGAME
 
         let _this = this
@@ -116,9 +117,9 @@ module.exports = class Game {
             _this.endGame(_this)
         }
 
-        io.to(_this.id.toString()).emit('update-board-state', { //emit player location/board status
-            players: _this.players,
-        })
+        // io.to(_this.id.toString()).emit('update-board-state', { //emit player location/board status
+        //     players: _this.players,
+        // })
     }
 
     // GAME PROCESS HELPERS

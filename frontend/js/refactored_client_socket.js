@@ -1,19 +1,19 @@
-import { client_constants } from '../../server/socket_constants'
 import Canvas from '/static/js/canvas.js'
-import {colors, server_socket, client_socket} from '/static/js/constants.js'
+import {colors} from '/static/js/constants.js'
 
 let client_canvas = null
 
-const server_socket_constants = {
+const server_constants = {
     CONNECTION: 'connection',
     DISCONNECT: 'disconnect',
+    INIT_CLIENT: 'init-client',
     JOIN_PUBLIC: 'player-join-global-game',
     JOIN_PRIVATE: 'player-join-private-game',
     START_PRIVATE: 'game-start',
     USER_GAME_INPUT: 'user-input-data'
 }
 
-const client_socket_constants = {
+const client_constants = {
     SHOW_GAME: 'game-starting',
     SHOW_LOBBY: 'show-lobby',
     UPDATE_LOBBY: 'update-lobby',
@@ -32,8 +32,9 @@ soc.addEventListener('open', function (event) {
 // Listen for messages
 soc.addEventListener('message', function (e) {
     let packet = JSON.parse(e.data);
+    console.log(packet.cmd)
     switch(packet.cmd) {
-        case client_constants.CONNECTION:
+        case client_constants.INIT_CLIENT:
             soc.id = packet.id
             break;
         case client_constants.INIT_BOARD:
@@ -112,7 +113,7 @@ function play() {
             soc.send(JSON.stringify(packet))
         } else {
             let packet = {
-                cmd: client_constants.JOIN_PUBLIC,
+                cmd: client_constants.JOIN_PUBLIC
             }
             soc.send(JSON.stringify(packet))
         }

@@ -1,9 +1,9 @@
 const Game = require('../game_logic/game.js')
-const {server_constants, client_constants} = require('./socket_constants')
 
 const socket_constants = {
     CONNECTION: 'open',
     DISCONNECT: 'close',
+    INIT_CLIENT: 'init-client',
     CLIENT_MESSAGE: 'message',
     JOIN_PUBLIC: 'player-join-global-game',
     JOIN_PRIVATE: 'player-join-private-game',
@@ -25,21 +25,24 @@ module.exports = function(io) {
     io.on(socket_constants.CONNECTION, function connection(socket) {
         socket.id = io.getUniqueID();
         let packet = {
-            cmd: server_socket.CONNECTION,
+            cmd: server_socket.INIT_CLIENT,
             id: socket.id
         }
-        soc.send(JSON.stringify(packet))
+        socket.send(JSON.stringify(packet))
+        console.log('Client Connected id: '+socket.id)
+
         manager.connectUser(socket)
 
         socket.on(socket_constants.CLIENT_MESSAGE, function incoming(e) {
             let packet = JSON.parse(e.data);
+            console.log(packet.cmd)
             switch(packet.cmd) {
                 case socket_constants.JOIN_PUBLIC:
                     let player_name = packet.name
                     io.connectUserToPublicGame(socket, player_name) 
                     break;
                 case socket_constants.JOIN_PRIVATE:
-                    let player_name = packet.name
+                    player_name = packet.name
                     let url = packet.gameurl
                     connectUsertoPrivateGame(socket, url, player_name)
                     break;
@@ -58,8 +61,8 @@ module.exports = function(io) {
                     }
                     break;
                 case socket_constants.USER_GAME_INPUT:
-                    let player = manager.connections[socket.id]
-                    let gameKey = player.gameKey
+                    player = manager.connections[socket.id]
+                    gameKey = player.gameKey
                     if(gameKey != null) {
                         manager.games[gameKey].handleUserInputData(packet.id, packet.keyinputs)
                     }
