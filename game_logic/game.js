@@ -1,11 +1,16 @@
-const { fork } = require('child_process');
 const {Tile, Player, KeyInputs} = require('./entity.js')
 const Maze = require('./maze.js')
 
-var server = require('http').createServer();
-var io = require('socket.io')(server);
-var redis = require('socket.io-redis');
-io.adapter(redis({ host: 'localhost', port: 6379 }));
+const ws = require('ws');
+const io = new ws.Server({ noServer: true });
+
+const client_constants = {
+    SHOW_GAME: 'game-starting',
+    SHOW_LOBBY: 'show-lobby',
+    UPDATE_LOBBY: 'update-lobby',
+    UPDATE_BOARD: 'update-board-state',
+    INIT_BOARD: 'init-board-state'
+}
 
 module.exports = class Game {
     static gameStates = {
@@ -17,6 +22,7 @@ module.exports = class Game {
     constructor(id) {
         this.id = id
         this.players = {}
+        this.clients = {}
         this.gameState = Game.gameStates.LOBBY
 
         this.grid_size = 10
@@ -58,6 +64,7 @@ module.exports = class Game {
 
     removePlayer(socketID) {
         delete this.players[socketID]
+        delete this.clients[socketID]
         if(this.gameState == Game.gameStates.INGAME) { //IF IN GAME SEND PLAYER DATA
             if(this.players.length == 0) { ///KILLS GAME PROCESSES
                 this.endGame()
@@ -65,13 +72,16 @@ module.exports = class Game {
         }
     }
 
-    addPlayer(socketID, player_name) {
-        let player = new Player(socketID, player_name, null, 1, 1, 0.5)
-        this.players[socketID] = player
+    addPlayer(socket, player_name) {
+        let player = new Player(socket.id, player_name, null, 1, 1, 0.5)
+        this.players[socket.id] = player
+        this.clients[socket.id] = socket
         if(this.gameState == Game.gameStates.INGAME) {
-            io.to(socketID).emit('init-board-state', { //imit init board state
+            let packet = {
+                cmd: client_constants.INIT_BOARD,
                 map: this.tiles
-            })
+            }
+            socket.send(JSON.stringify(packet))
         }
     }
 
@@ -88,25 +98,17 @@ module.exports = class Game {
             this.players[socketID].playerState = playerState
         }   
     }
-   
-    static game_process_child_commands = {
-        START_GAME: 0,
-        USER_INPUT: 1,
-        USER_ADDED: 2,
-        USER_REMOVED:3,
-        USER_POSITION: 4,
-        RESET_MAP: 5
-    }
-
-    static game_process_parent_commands = {
-        UPDATED_USER_POSITION: 0,
-        RESET_BOARD_STATE: 1
-    }
 
     startGame() {
-        io.to(this.id.toString()).emit('init-board-state', { //imit init board state
+        let packet = {
+            cmd: client_constants.INIT_BOARD,
             map: this.tiles
-        })
+        }
+        let game_client_list = this.clients
+        for (var id in game_client_list){
+            game_client_list[id].send(JSON.stringify(packet))
+        }
+
         this.gameState = Game.gameStates.INGAME
 
         let _this = this
@@ -131,9 +133,14 @@ module.exports = class Game {
             _this.endGame(_this)
         }
 
-        io.to(_this.id.toString()).emit('update-board-state', { //emit player location/board status
-            players: _this.players,
-        })
+        let packet = {
+            cmd: client_constants.UPDATE_BOARD,
+            players: _this.players
+        }
+        let game_client_list = this.clients
+        for (var id in game_client_list){
+            game_client_list[id].send(JSON.stringify(packet))
+        }
     }
 
     // GAME PROCESS HELPERS

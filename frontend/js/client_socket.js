@@ -1,5 +1,5 @@
 import Canvas from '/static/js/canvas.js'
-import {colors, server_socket, client_socket} from '/static/js/constants.js'
+import {colors} from '/static/js/constants.js'
 
 const socket = io.connect();
 let client_canvas = null
@@ -14,9 +14,6 @@ socket.on(client_socket.INIT_BOARD, function(data) {
 })
 
 socket.on(client_socket.UPDATE_BOARD, function(data) {
-    // if(!client_canvas) {
-    //     client_canvas = new Canvas(data.walls.length) 
-    // }
     client_canvas.board.colorBG(colors.white) //bg
     client_canvas.board.paintObstacles(colors.red) //walls
     client_canvas.board.paintPlayers(socket.id, data.players)

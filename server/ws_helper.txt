@@ -1,0 +1,32 @@
+SERVER SIDE EXAMPLE CODE:
+-------------------------
+io.on('connection', function connection(socket) {
+        socket.id = io.getUniqueID();
+        
+        let packet = {
+            msga: 'MESSAGE A',
+            msgb: 'MESSAGE B'
+        }
+        socket.send(JSON.stringify(packet))
+
+        socket.on('message', function incoming(message) {
+          console.log('received: %s', message);
+        });
+    });
+
+
+CLIENT SIDE EXAMPLE CODE:
+-------------------------
+// Create WebSocket connection.
+const soc = new WebSocket('ws://localhost:8080');
+
+// Connection opened
+soc.addEventListener('open', function (event) {
+    soc.send('Hello Server!');
+});
+
+// Listen for messages
+soc.addEventListener('message', function (e) {
+    var packet = JSON.parse(e.data);
+    console.log('Message from server ', packet.msga);
+});

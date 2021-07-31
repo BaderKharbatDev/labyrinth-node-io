@@ -7,6 +7,8 @@ module.exports = function(io) {
 
     io.on(server_constants.CONNECTION, (socket) => {
 
+        console.log('connected')
+
         //connects and adds a user to game
         manager.connectUser(socket)
 
