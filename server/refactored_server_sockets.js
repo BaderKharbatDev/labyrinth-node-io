@@ -35,41 +35,36 @@ module.exports = function(io) {
         manager.connectUser(socket)
 
         socket.on(socket_constants.CLIENT_MESSAGE, function incoming(e) {
-            let packet = JSON.parse(e)
+            var packet = JSON.parse(e)
             // console.log(packet.cmd)
-
-            switch(packet.cmd) {
-                case socket_constants.JOIN_PUBLIC:
-                    let player_name = packet.name
-                    io.connectUserToPublicGame(socket, player_name) 
-                    break;
-                case socket_constants.JOIN_PRIVATE:
-                    player_name = packet.name
-                    let url = packet.gameurl
-                    connectUsertoPrivateGame(socket, url, player_name)
-                    break;
-                case socket_constants.START_PRIVATE:
-                    let player = manager.connections[socket.id]
-                    let gameKey = player.gameKey
-                    if(gameKey != null) {
-                        manager.startGame(gameKey)
-                        let n_packet = {
-                            cmd: client_constants.SHOW_GAME
-                        }
-                        let game_client_list = manager.games[gameKey].clients
-                        for (var id in game_client_list){
-                            game_client_list[id].send(JSON.stringify(n_packet))
-                        }
+            let cmd = packet.cmd
+            if(cmd == socket_constants.JOIN_PUBLIC){
+                let player_name = packet.name
+                io.connectUserToPublicGame(socket, player_name) 
+            } else if(cmd == socket_constants.JOIN_PRIVATE) {
+                let player_name = packet.name
+                let url = packet.gameurl
+                connectUsertoPrivateGame(socket, url, player_name)
+            } else if(cmd == socket_constants.START_PRIVATE) {
+                let player = manager.connections[socket.id]
+                let gameKey = player.gameKey
+                if(gameKey != null) {
+                    manager.startGame(gameKey)
+                    let n_packet = {
+                        cmd: client_constants.SHOW_GAME
                     }
-                    break;
-                case socket_constants.USER_GAME_INPUT:
-                    player = manager.connections[socket.id]
-                    gameKey = player.gameKey
-                    if(gameKey != null) {
-                        manager.games[gameKey].handleUserInputData(packet.id, packet.keyinputs)
+                    let game_client_list = manager.games[gameKey].clients
+                    for (var id in game_client_list){
+                        game_client_list[id].send(JSON.stringify(n_packet))
                     }
-                    break;
-            }
+                }
+            } else if(cmd == socket_constants.USER_GAME_INPUT) {
+                let player = manager.connections[socket.id]
+                let gameKey = player.gameKey
+                if(gameKey != null) {
+                    manager.games[gameKey].handleUserInputData(packet.id, packet.keyinputs)
+                }
+            } 
         });
 
         socket.on(socket_constants.DISCONNECT, function close() {

@@ -1,8 +1,16 @@
 const {Tile, Player, KeyInputs} = require('./entity.js')
 const Maze = require('./maze.js')
 
-// const ws = require('ws');
-// const io = new ws.Server({ noServer: true });
+const ws = require('ws');
+const io = new ws.Server({ noServer: true });
+
+const client_constants = {
+    SHOW_GAME: 'game-starting',
+    SHOW_LOBBY: 'show-lobby',
+    UPDATE_LOBBY: 'update-lobby',
+    UPDATE_BOARD: 'update-board-state',
+    INIT_BOARD: 'init-board-state'
+}
 
 module.exports = class Game {
     static gameStates = {
@@ -69,9 +77,11 @@ module.exports = class Game {
         this.players[socket.id] = player
         this.clients[socket.id] = socket
         if(this.gameState == Game.gameStates.INGAME) {
-            // io.to(socket.id).emit('init-board-state', { //imit init board state
-            //     map: this.tiles
-            // })
+            let packet = {
+                cmd: client_constants.INIT_BOARD,
+                map: this.tiles
+            }
+            socket.send(JSON.stringify(packet))
         }
     }
 
@@ -90,9 +100,15 @@ module.exports = class Game {
     }
 
     startGame() {
-        // io.to(this.id.toString()).emit('init-board-state', { //imit init board state
-        //     map: this.tiles
-        // })
+        let packet = {
+            cmd: client_constants.INIT_BOARD,
+            map: this.tiles
+        }
+        let game_client_list = this.clients
+        for (var id in game_client_list){
+            game_client_list[id].send(JSON.stringify(packet))
+        }
+
         this.gameState = Game.gameStates.INGAME
 
         let _this = this
@@ -117,9 +133,14 @@ module.exports = class Game {
             _this.endGame(_this)
         }
 
-        // io.to(_this.id.toString()).emit('update-board-state', { //emit player location/board status
-        //     players: _this.players,
-        // })
+        let packet = {
+            cmd: client_constants.UPDATE_BOARD,
+            players: _this.players
+        }
+        let game_client_list = this.clients
+        for (var id in game_client_list){
+            game_client_list[id].send(JSON.stringify(packet))
+        }
     }
 
     // GAME PROCESS HELPERS
