@@ -1,7 +1,7 @@
 const Game = require('../game_logic/game.js')
 
 const socket_constants = {
-    CONNECTION: 'open',
+    CONNECTION: 'connection',
     DISCONNECT: 'close',
     INIT_CLIENT: 'init-client',
     CLIENT_MESSAGE: 'message',
@@ -73,7 +73,9 @@ module.exports = function(io) {
         socket.on(socket_constants.DISCONNECT, function close() {
             manager.disconnectUser(socket.id)
         });
+    });
 
+    
         //-----------------------helper functions
         io.getUniqueID = function () {
             function s4() {
@@ -143,7 +145,6 @@ module.exports = function(io) {
             }
             socket.send(JSON.stringify(packet))
         }
-    });
 }
 
 class Manager {
