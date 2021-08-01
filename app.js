@@ -15,10 +15,10 @@ var server = require('https').createServer({
 const ws = require('ws');
 var port = 443
 
-// const io = new ws.Server({ noServer: true })
-const io = new ws.Server({
-    server: server
-});
+const io = new ws.Server({ noServer: true })
+// const io = new ws.Server({
+//     server: server
+// });
 
 // import routes
 require('./server/server_routing')(app, express)
