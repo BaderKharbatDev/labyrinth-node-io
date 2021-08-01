@@ -44,8 +44,10 @@ export default class board {
     }
 
     paintPlayers(socketID, players) {
+        // console.log(socketID)
+        // console.log(players)
         for(var key in players) {
-            if(key == socketID) {
+            if(key == socketID.toString()) {
                 this.ctx.fillStyle = colors.blue
             } else {
                 this.ctx.fillStyle = colors.black
