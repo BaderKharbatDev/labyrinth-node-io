@@ -6,10 +6,6 @@ var port = 80
 
 const io = new ws.Server({ noServer: true })
 
-// var io = require('socket.io')(server);
-// var redis = require('socket.io-redis');
-// io.adapter(redis({ host: 'localhost', port: 6379 }));
-
 // import routes
 require('./server/server_routing')(app, express)
 // import socket functions
