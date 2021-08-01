@@ -23,7 +23,7 @@ const client_constants = {
 
 // Create WebSocket connection.
 // const soc = new WebSocket('ws://localhost:80');
-var soc = new WebSocket('ws://3.138.32.158', 'echo-protocol');
+var soc = new WebSocket('wss://3.138.32.158', 'echo-protocol');
 
 // Connection opened
 soc.addEventListener('open', function (event) {
