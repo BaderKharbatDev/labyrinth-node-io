@@ -2,8 +2,11 @@ const fs = require('fs');
 var express = require('express');
 var app = express();
 
-var privateKey = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/privkey.pem' );
-var certificate = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/fullchain.pem' );
+// var privateKey = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/privkey.pem' );
+// var certificate = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/fullchain.pem' );
+var privateKey = fs.readFileSync(__dirname + '/ssl/private.key', 'utf8')
+var certificate = fs.readFileSync(__dirname + '/ssl/cert.key', 'utf8')
+
 var server = require('https').createServer({
     key: privateKey,
     cert: certificate
