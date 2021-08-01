@@ -1,6 +1,14 @@
+const { createPrivateKey } = require('crypto');
 var express = require('express');
 var app = express();
-var server = require('http').createServer(app);
+
+var privateKey = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/privkey.pem' );
+var certificate = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/fullchain.pem' );
+var server = require('https').createServer({
+    key: privateKey,
+    cert: certificate
+}, app);
+
 const ws = require('ws');
 var port = 80
 
@@ -19,4 +27,3 @@ server.on('upgrade', (request, socket, head) => {
 });
 
 console.log('Started on '+port)
-
