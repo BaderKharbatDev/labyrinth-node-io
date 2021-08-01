@@ -4,8 +4,8 @@ var app = express();
 
 // var privateKey = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/privkey.pem' );
 // var certificate = fs.readFileSync( '/etc/letsencrypt/live/buttholefart.com/fullchain.pem' );
-var privateKey = fs.readFileSync(__dirname + '/ssl/private.key', 'utf8')
-var certificate = fs.readFileSync(__dirname + '/ssl/cert.key', 'utf8')
+var privateKey = fs.readFileSync(__dirname + '/ssl/privkey.pem', 'utf8')
+var certificate = fs.readFileSync(__dirname + '/ssl/cert.pem', 'utf8')
 
 var server = require('https').createServer({
     key: privateKey,
@@ -13,9 +13,12 @@ var server = require('https').createServer({
 }, app);
 
 const ws = require('ws');
-var port = 80
+var port = 443
 
-const io = new ws.Server({ noServer: true })
+// const io = new ws.Server({ noServer: true })
+const io = new ws({
+    server: server
+});
 
 // import routes
 require('./server/server_routing')(app, express)
