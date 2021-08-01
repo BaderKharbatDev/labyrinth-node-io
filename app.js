@@ -16,7 +16,7 @@ const ws = require('ws');
 var port = 443
 
 // const io = new ws.Server({ noServer: true })
-const io = new ws({
+const io = new ws.Server({
     server: server
 });
 
