@@ -31,7 +31,7 @@ module.exports = class Game {
         this.game_process = null
 
         let second = 1000
-        let fps = 20
+        let fps = 40
         let tickRate = second/fps
         this.tickRate = tickRate
     }
